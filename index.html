@@ -96,7 +96,7 @@
         <!-- SECTION 3: AREA HR -->
         <div id="section-hr" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 hidden">
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Risorse Umane (HR)</h1>
-            <p class="text-slate-600 mb-6">Pannello di controllo riservato al team HR per la verifica globale dell'avanzamento.</p>
+            <p class="text-slate-600 mb-6">Pannello di controllo riservato al team HR per la verifica globale dell'avanzamento e gestione anagrafica.</p>
 
             <!-- Login HR -->
             <div id="hr-login-box" class="max-w-md space-y-4">
@@ -122,12 +122,15 @@
                 </div>
 
                 <!-- Sub-Tabs HR -->
-                <div class="flex gap-4 border-b border-slate-200 mb-6">
+                <div class="flex flex-wrap gap-4 border-b border-slate-200 mb-6">
                     <button id="subtab-autoval" onclick="switchHRSubtab('autoval')" class="pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">
                         1. Autovalutazioni Dipendenti
                     </button>
                     <button id="subtab-referenti" onclick="switchHRSubtab('referenti')" class="pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700">
                         2. Feedback Referenti
+                    </button>
+                    <button id="subtab-anagrafica" onclick="switchHRSubtab('anagrafica')" class="pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700">
+                        3. Gestione Anagrafica
                     </button>
                 </div>
 
@@ -179,6 +182,83 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- HR Sub-Section 3: Gestione Anagrafica -->
+                <div id="hr-sub-anagrafica" class="hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <input type="text" id="hr-search-anagrafica" onkeyup="filterAnagrafica()" placeholder="Cerca in anagrafica..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
+                        <button onclick="toggleAddEmployeeModal(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
+                            ➕ Aggiungi Nuovo Dipendente
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-[550px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
+                                <tr>
+                                    <th class="p-2">Azienda</th>
+                                    <th class="p-2">Cognome</th>
+                                    <th class="p-2">Nome</th>
+                                    <th class="p-2">Email</th>
+                                    <th class="p-2">Inquadramento</th>
+                                    <th class="p-2">BU</th>
+                                    <th class="p-2">Team</th>
+                                    <th class="p-2">Referente</th>
+                                    <th class="p-2 text-center">Azioni</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hr-table-anagrafica" class="divide-y divide-slate-200 text-xs"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE AGGIUNGI / MODIFICA DIPENDENTE -->
+    <div id="modal-employee" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+            <h3 id="modal-employee-title" class="text-lg font-bold text-slate-800">Aggiungi Dipendente</h3>
+            <input type="hidden" id="edit-emp-id">
+            
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Azienda</label>
+                    <input type="text" id="emp-azienda" placeholder="HQ ENGINEERING SRL" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Inquadramento</label>
+                    <input type="text" id="emp-inquadramento" placeholder="Dipendente / PartitaIVA / CoCoCo" class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Cognome *</label>
+                    <input type="text" id="emp-cognome" required class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nome *</label>
+                    <input type="text" id="emp-nome" required class="w-full p-2 border rounded">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Email Aziendale *</label>
+                    <input type="email" id="emp-email" required class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Business Unit (BU)</label>
+                    <input type="text" id="emp-bu" placeholder="CONSULENZA / RADIOMOBILE..." class="w-full p-2 border rounded">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Team</label>
+                    <input type="text" id="emp-team" class="w-full p-2 border rounded">
+                </div>
+                <div class="col-span-2">
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Referente (Cognome)</label>
+                    <input type="text" id="emp-referente" placeholder="Morolla / Russo..." class="w-full p-2 border rounded">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+                <button onclick="toggleAddEmployeeModal(false)" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Annulla</button>
+                <button onclick="saveEmployee()" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium">Salva Dipendente</button>
             </div>
         </div>
     </div>
@@ -215,17 +295,18 @@
         }
 
         function switchHRSubtab(subtab) {
-            const isAutoval = subtab === 'autoval';
-            document.getElementById('hr-sub-autoval').classList.toggle('hidden', !isAutoval);
-            document.getElementById('hr-sub-referenti').classList.toggle('hidden', isAutoval);
+            document.getElementById('hr-sub-autoval').classList.toggle('hidden', subtab !== 'autoval');
+            document.getElementById('hr-sub-referenti').classList.toggle('hidden', subtab !== 'referenti');
+            document.getElementById('hr-sub-anagrafica').classList.toggle('hidden', subtab !== 'anagrafica');
 
-            document.getElementById('subtab-autoval').className = isAutoval 
-                ? 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600' 
-                : 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
-
-            document.getElementById('subtab-referenti').className = !isAutoval 
-                ? 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600' 
-                : 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
+            ['autoval', 'referenti', 'anagrafica'].forEach(st => {
+                const btn = document.getElementById(`subtab-${st}`);
+                if (st === subtab) {
+                    btn.className = 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600';
+                } else {
+                    btn.className = 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
+                }
+            });
         }
 
         // --- ROUTING AREA PERSONALE ---
@@ -235,7 +316,7 @@
             const msg = document.getElementById('msg-routing');
             msg.classList.add('hidden');
 
-            // 1. Cerca l'utente per email
+            // 1. Cerca l'utente per email dall'anagrafica aggiornata
             const { data: user, error } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
@@ -269,16 +350,11 @@
             const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
 
             setTimeout(() => {
-                // A. Se è un Referente/Coordinator -> Modulo Coordinator
                 if (isCoordinatorReal) {
                     window.location.href = FORM_COORDINATOR;
-                } 
-                // B. Se BU o Team è CONSULENZA -> Modulo Consulenti
-                else if (isConsulenza) {
+                } else if (isConsulenza) {
                     window.location.href = FORM_CONSULENTI;
-                } 
-                // C. Tutti gli altri -> Modulo Generale
-                else {
+                } else {
                     window.location.href = FORM_GENERALE;
                 }
             }, 800);
@@ -424,6 +500,7 @@
 
             renderHRAutovalutazioni();
             renderHRReferenti();
+            renderHRAnagrafica();
         }
 
         function renderHRAutovalutazioni() {
@@ -497,6 +574,122 @@
                     </td>
                 `;
                 tbody.appendChild(tr);
+            });
+        }
+
+        // --- GESTIONE ANAGRAFICA ---
+        function renderHRAnagrafica() {
+            const tbody = document.getElementById('hr-table-anagrafica');
+            tbody.innerHTML = '';
+
+            allDipendentiCache.forEach(m => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b anag-row';
+                tr.setAttribute('data-search', `${m.azienda} ${m.cognome} ${m.nome} ${m.email} ${m.bu} ${m.team} ${m.referente}`.toLowerCase());
+
+                tr.innerHTML = `
+                    <td class="p-2 text-slate-600">${m.azienda || '-'}</td>
+                    <td class="p-2 font-medium text-slate-900">${m.cognome}</td>
+                    <td class="p-2 font-medium text-slate-900">${m.nome}</td>
+                    <td class="p-2 text-slate-600">${m.email}</td>
+                    <td class="p-2 text-slate-500">${m.inquadramento || '-'}</td>
+                    <td class="p-2 text-slate-500">${m.bu || '-'}</td>
+                    <td class="p-2 text-slate-500">${m.team || '-'}</td>
+                    <td class="p-2 text-slate-500">${m.referente || '-'}</td>
+                    <td class="p-2 text-center flex justify-center gap-2">
+                        <button onclick="editEmployee(${m.id})" class="text-indigo-600 hover:text-indigo-900 font-medium">✏️ Modifica</button>
+                        <button onclick="deleteEmployee(${m.id}, '${m.email}')" class="text-red-600 hover:text-red-900 font-medium">🗑️ Elimina</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleAddEmployeeModal(show) {
+            document.getElementById('modal-employee').classList.toggle('hidden', !show);
+            if (show && !document.getElementById('edit-emp-id').value) {
+                document.getElementById('modal-employee-title').textContent = 'Aggiungi Dipendente';
+                document.getElementById('edit-emp-id').value = '';
+                document.getElementById('emp-azienda').value = 'HQ ENGINEERING SRL';
+                document.getElementById('emp-cognome').value = '';
+                document.getElementById('emp-nome').value = '';
+                document.getElementById('emp-email').value = '';
+                document.getElementById('emp-inquadramento').value = 'Dipendente';
+                document.getElementById('emp-bu').value = '';
+                document.getElementById('emp-team').value = '';
+                document.getElementById('emp-referente').value = '';
+            }
+        }
+
+        function editEmployee(id) {
+            const emp = allDipendentiCache.find(e => e.id === id);
+            if (!emp) return;
+
+            document.getElementById('modal-employee-title').textContent = 'Modifica Dipendente';
+            document.getElementById('edit-emp-id').value = emp.id;
+            document.getElementById('emp-azienda').value = emp.azienda || '';
+            document.getElementById('emp-cognome').value = emp.cognome || '';
+            document.getElementById('emp-nome').value = emp.nome || '';
+            document.getElementById('emp-email').value = emp.email || '';
+            document.getElementById('emp-inquadramento').value = emp.inquadramento || '';
+            document.getElementById('emp-bu').value = emp.bu || '';
+            document.getElementById('emp-team').value = emp.team || '';
+            document.getElementById('emp-referente').value = emp.referente || '';
+
+            toggleAddEmployeeModal(true);
+        }
+
+        async function saveEmployee() {
+            const id = document.getElementById('edit-emp-id').value;
+            const payload = {
+                azienda: document.getElementById('emp-azienda').value.trim(),
+                cognome: document.getElementById('emp-cognome').value.trim(),
+                nome: document.getElementById('emp-nome').value.trim(),
+                email: document.getElementById('emp-email').value.trim().toLowerCase(),
+                inquadramento: document.getElementById('emp-inquadramento').value.trim(),
+                bu: document.getElementById('emp-bu').value.trim(),
+                team: document.getElementById('emp-team').value.trim(),
+                referente: document.getElementById('emp-referente').value.trim()
+            };
+
+            if (!payload.cognome || !payload.nome || !payload.email) {
+                alert('I campi Cognome, Nome ed Email sono obbligatori.');
+                return;
+            }
+
+            let error;
+            if (id) {
+                ({ error } = await supabaseClient.from('dipendenti').update(payload).eq('id', id));
+            } else {
+                ({ error } = await supabaseClient.from('dipendenti').insert([payload]));
+            }
+
+            if (error) {
+                alert('Errore durante il salvataggio: ' + error.message);
+            } else {
+                toggleAddEmployeeModal(false);
+                loadHRData();
+            }
+        }
+
+        async function deleteEmployee(id, email) {
+            if (!confirm(`Sei sicuro di voler eliminare ${email} dall'anagrafica?`)) return;
+
+            const { error } = await supabaseClient.from('dipendenti').delete().eq('id', id);
+
+            if (error) {
+                alert('Errore durante l\'eliminazione: ' + error.message);
+            } else {
+                loadHRData();
+            }
+        }
+
+        function filterAnagrafica() {
+            const query = document.getElementById('hr-search-anagrafica').value.toLowerCase();
+            const rows = document.querySelectorAll('.anag-row');
+            rows.forEach(r => {
+                const text = r.getAttribute('data-search');
+                r.style.display = text.includes(query) ? '' : 'none';
             });
         }
 
