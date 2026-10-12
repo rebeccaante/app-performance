@@ -235,6 +235,7 @@
             const msg = document.getElementById('msg-routing');
             msg.classList.add('hidden');
 
+            // 1. Cerca l'utente per email
             const { data: user, error } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
@@ -252,12 +253,30 @@
             msg.className = 'mt-4 text-sm font-medium text-green-600';
             msg.classList.remove('hidden');
 
+            // 2. Verifica dinamica se è referente di qualcuno
+            const userCognome = user.cognome.trim();
+            const { data: isReferenteForTeam } = await supabaseClient
+                .from('dipendenti')
+                .select('id')
+                .ilike('referente', `%${userCognome}%`)
+                .limit(1);
+
+            const isCoordinatorReal = (isReferenteForTeam && isReferenteForTeam.length > 0) || user.is_coordinator === true;
+
+            const buUpper = (user.bu || '').toUpperCase();
+            const teamUpper = (user.team || '').toUpperCase();
+
             setTimeout(() => {
-                if (user.is_coordinator) {
+                // A. Se è un Referente/Coordinator -> Modulo Coordinator
+                if (isCoordinatorReal) {
                     window.location.href = FORM_COORDINATOR;
-                } else if (user.team && user.team.toUpperCase() === 'CONSULENZA') {
+                } 
+                // B. Se appartiene a BU o Team Consulenza -> Modulo Consulenti
+                else if (buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA')) {
                     window.location.href = FORM_CONSULENTI;
-                } else {
+                } 
+                // C. Per tutti gli altri -> Modulo Generale
+                else {
                     window.location.href = FORM_GENERALE;
                 }
             }, 800);
