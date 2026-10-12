@@ -1,89 +1,276 @@
-<div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
-    <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-slate-800">Area Personale</h1>
-        <p class="text-sm text-slate-500 mt-2">Inserisci la tua email aziendale per accedere al modulo preposto.</p>
-    </div>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Performance & Area Coordinator</title>
+    <!-- Tailwind CSS per la grafica -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Client Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-    <form id="loginForm" onsubmit="handleLogin(event)" class="space-y-6">
-        <div>
-            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Aziendale</label>
-            <input 
-                type="email" 
-                id="email" 
-                required 
-                placeholder="nome.cognome@hqe.it"
-                class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-            />
+    <div class="max-w-4xl mx-auto py-10 px-4">
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-300 mb-8">
+            <button id="tab-personale" onclick="switchTab('personale')" class="py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none">
+                1. Area Personale
+            </button>
+            <button id="tab-coordinator" onclick="switchTab('coordinator')" class="py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none">
+                2. Area Coordinator
+            </button>
         </div>
 
-        <button 
-            type="submit" 
-            id="submitBtn"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition flex items-center justify-center"
-        >
-            <span id="btnText">Accedi al Modulo</span>
-            <span id="loader" class="hidden animate-spin ml-2">🌀</span>
-        </button>
-    </form>
+        <!-- SECTION 1: AREA PERSONALE -->
+        <div id="section-personale" class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Personale - Valutazioni</h1>
+            <p class="text-slate-600 mb-6">Inserisci la tua email aziendale per accedere al modulo di valutazione riservato al tuo ruolo.</p>
+            
+            <form id="form-routing" onsubmit="handleRouting(event)" class="space-y-4 max-w-md">
+                <div>
+                    <label for="user-email" class="block text-sm font-medium text-slate-700 mb-1">Email Aziendale</label>
+                    <input type="email" id="user-email" required placeholder="nome.cognome@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <button type="submit" id="btn-submit-routing" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Vai al modulo dedicato
+                </button>
+            </form>
+            <div id="msg-routing" class="mt-4 text-sm font-medium hidden"></div>
+        </div>
 
-    <div id="errorMessage" class="hidden mt-4 p-3 bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg text-center"></div>
-</div>
+        <!-- SECTION 2: AREA COORDINATOR -->
+        <div id="section-coordinator" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 hidden">
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Coordinator</h1>
+            <p class="text-slate-600 mb-6">Accedi per visionare e confermare le schede del tuo team.</p>
 
-<script>
-    // CONFIGURAZIONE SUPABASE - Inserisci le tue chiavi ottenute da Supabase
-    const SUPABASE_URL = "https://icwvqpdhloeegwcgmgpa.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_3JQdZmfHynkXkDT8t-0sxQ_1vZ13u9r";
+            <!-- Login Coordinator -->
+            <div id="coordinator-login-box" class="max-w-md space-y-4">
+                <div>
+                    <label for="coord-email" class="block text-sm font-medium text-slate-700 mb-1">Email Coordinator</label>
+                    <input type="email" id="coord-email" placeholder="chiara.pizzorno@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label for="coord-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input type="password" id="coord-password" placeholder="••••••••" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <button onclick="loginCoordinator()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Accedi al Team
+                </button>
+                <div id="coord-login-msg" class="text-sm font-medium text-red-600 hidden"></div>
+            </div>
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            <!-- Dashboard Team (Visibile dopo il login) -->
+            <div id="coordinator-dashboard" class="hidden">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                    <div>
+                        <h2 id="welcome-coord" class="text-xl font-bold text-slate-800">Team di ...</h2>
+                        <p class="text-sm text-slate-500">Gestione e conferma valori per i componenti del team</p>
+                    </div>
+                    <button onclick="logoutCoordinator()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                </div>
 
-    // LINK AI MODULI GOOGLE
-    const FORM_COORDINATOR = "https://forms.gle/kFVf7fZQ29R1iWyG9";
-    const FORM_CONSULENTI = "https://forms.gle/5mvhoogatn8mkfmGA";
-    const FORM_GENERALE = "https://forms.gle/ZgR3t5SwTnQ8zsj69";
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
+                                <th class="p-3">Dipendente</th>
+                                <th class="p-3">Email</th>
+                                <th class="p-3">Team / BU</th>
+                                <th class="p-3 text-center">Inviato da Dipendente</th>
+                                <th class="p-3 text-center">Confermato/Modificato</th>
+                                <th class="p-3">Azione</th>
+                            </tr>
+                        </thead>
+                        <tbody id="team-table-body" class="divide-y divide-slate-200 text-sm">
+                            <!-- Popolato dinamicamente da JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    async function handleLogin(event) {
-        event.preventDefault();
-        
-        const emailInput = document.getElementById('email').value.trim().toLowerCase();
-        const errorDiv = document.getElementById('errorMessage');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnText = document.getElementById('btnText');
-        const loader = document.getElementById('loader');
+    <script>
+        // --- CONFIGURAZIONE SUPABASE ---
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; // Sostituisci con il tuo URL Supabase
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Sostituisci con la Publishable/Anon Key
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        errorDiv.classList.add('hidden');
-        submitBtn.disabled = true;
-        btnText.textContent = "Verifica in corso...";
-        loader.classList.remove('hidden');
+        // --- LINK GOOGLE FORMS ---
+        const FORM_COORDINATOR = 'https://forms.gle/kFVf7fZQ29R1iWyG9';
+        const FORM_CONSULENTI = 'https://forms.gle/5mvhoogatn8mkfmGA';
+        const FORM_GENERALE = 'https://forms.gle/ZgR3t5SwTnQ8zsj69';
 
-        try {
-            // Interrogazione al database Supabase
-            const { data: user, error } = await supabaseClient
+        // --- SWAP TABS ---
+        function switchTab(tab) {
+            const secPersonale = document.getElementById('section-personale');
+            const secCoordinator = document.getElementById('section-coordinator');
+            const btnPersonale = document.getElementById('tab-personale');
+            const btnCoordinator = document.getElementById('tab-coordinator');
+
+            if (tab === 'personale') {
+                secPersonale.classList.remove('hidden');
+                secCoordinator.classList.add('hidden');
+                btnPersonale.className = 'py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
+                btnCoordinator.className = 'py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none';
+            } else {
+                secPersonale.classList.add('hidden');
+                secCoordinator.classList.remove('hidden');
+                btnCoordinator.className = 'py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
+                btnPersonale.className = 'py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none';
+            }
+        }
+
+        // --- SEZIONE 1: LOGICA ROUTING ---
+        async function handleRouting(e) {
+            e.preventDefault();
+            const email = document.getElementById('user-email').value.trim().toLowerCase();
+            const msg = document.getElementById('msg-routing');
+            msg.classList.add('hidden');
+
+            const { data: user, error } = await supabase
                 .from('dipendenti')
                 .select('*')
-                .eq('email', emailInput)
+                .eq('email', email)
                 .maybeSingle();
 
-            if (error) throw error;
-
-            if (!user) {
-                throw new Error("Indirizzo email non trovato nell'anagrafica aziendale.");
+            if (error || !user) {
+                msg.textContent = 'Email non trovata nell\'anagrafica aziendale. Controlla e riprova.';
+                msg.className = 'mt-4 text-sm font-medium text-red-600';
+                msg.classList.remove('hidden');
+                return;
             }
 
-            // Logica di Routing prioritario
-            if (user.is_coordinator) {
-                window.location.href = FORM_COORDINATOR;
-            } else if (user.team && user.team.toUpperCase() === 'CONSULENZA') {
-                window.location.href = FORM_CONSULENTI;
-            } else {
-                window.location.href = FORM_GENERALE;
-            }
+            msg.textContent = 'Reindirizzamento al modulo in corso...';
+            msg.className = 'mt-4 text-sm font-medium text-green-600';
+            msg.classList.remove('hidden');
 
-        } catch (err) {
-            errorDiv.textContent = err.message || "Si è verificato un errore durante la verifica.";
-            errorDiv.classList.remove('hidden');
-            submitBtn.disabled = false;
-            btnText.textContent = "Accedi al Modulo";
-            loader.classList.add('hidden');
+            setTimeout(() => {
+                if (user.is_coordinator) {
+                    window.location.href = FORM_COORDINATOR;
+                } else if (user.team && user.team.toUpperCase() === 'CONSULENZA') {
+                    window.location.href = FORM_CONSULENTI;
+                } else {
+                    window.location.href = FORM_GENERALE;
+                }
+            }, 1000);
         }
-    }
-</script>
+
+        // --- SEZIONE 2: LOGICA AREA COORDINATOR ---
+        let currentCoordinator = null;
+
+        async function loginCoordinator() {
+            const email = document.getElementById('coord-email').value.trim().toLowerCase();
+            const pass = document.getElementById('coord-password').value.trim();
+            const msg = document.getElementById('coord-login-msg');
+            msg.classList.add('hidden');
+
+            if (pass !== 'randomico') {
+                msg.textContent = 'Password errata.';
+                msg.classList.remove('hidden');
+                return;
+            }
+
+            // Verifica se l'utente è nell'anagrafica
+            const { data: coordUser, error } = await supabase
+                .from('dipendenti')
+                .select('*')
+                .eq('email', email)
+                .maybeSingle();
+
+            if (error || !coordUser) {
+                msg.textContent = 'Email non trovata nell\'anagrafica.';
+                msg.classList.remove('hidden');
+                return;
+            }
+
+            currentCoordinator = coordUser;
+            document.getElementById('coordinator-login-box').classList.add('hidden');
+            document.getElementById('coordinator-dashboard').classList.remove('hidden');
+            document.getElementById('welcome-coord').textContent = `Team di ${coordUser.nome} ${coordUser.cognome}`;
+
+            loadTeamData(coordUser.cognome);
+        }
+
+        function logoutCoordinator() {
+            currentCoordinator = null;
+            document.getElementById('coordinator-login-box').classList.remove('hidden');
+            document.getElementById('coordinator-dashboard').classList.add('hidden');
+            document.getElementById('coord-password').value = '';
+        }
+
+        async function loadTeamData(coordCognome) {
+            const tbody = document.getElementById('team-table-body');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
+
+            // Trova tutti i dipendenti dove referente equivale al cognome del coordinator
+            const { data: teamMembers, error } = await supabase
+                .from('dipendenti')
+                .select('*')
+                .ilike('referente', `%${coordCognome}%`);
+
+            if (error || !teamMembers || teamMembers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nessun dipendente trovato per il referente "${coordCognome}".</td></tr>`;
+                return;
+            }
+
+            // Recupera le risposte eventualmente inviate
+            const emails = teamMembers.map(m => m.email);
+            const { data: responses } = await supabase
+                .from('risposte_valutazioni')
+                .select('*')
+                .in('email_dipendente', emails);
+
+            const responseMap = {};
+            if (responses) {
+                responses.forEach(r => { responseMap[r.email_dipendente] = r; });
+            }
+
+            tbody.innerHTML = '';
+            teamMembers.forEach(member => {
+                const resp = responseMap[member.email] || {};
+                const maxProposto = resp.max_days_proposti !== undefined ? resp.max_days_proposti : '-';
+                const maxApprovato = resp.max_days_approvati !== undefined ? resp.max_days_approvati : (resp.max_days_proposti || member.max_days || 4);
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b';
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-900">${member.cognome} ${member.nome}</td>
+                    <td class="p-3 text-slate-600">${member.email}</td>
+                    <td class="p-3 text-slate-500">${member.bu || '-'} / ${member.team || '-'}</td>
+                    <td class="p-3 text-center font-semibold text-slate-700">${maxProposto}</td>
+                    <td class="p-3 text-center">
+                        <input type="number" id="val-${member.id}" value="${maxApprovato}" min="0" max="30" class="w-16 p-1 text-center border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                    </td>
+                    <td class="p-3">
+                        <button onclick="saveMemberValuation('${member.email}', ${member.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                            Salva
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        async function saveMemberValuation(email, memberId) {
+            const newVal = parseInt(document.getElementById(`val-${memberId}`).value, 10);
+            
+            const { error } = await supabase
+                .from('risposte_valutazioni')
+                .upsert({
+                    email_dipendente: email,
+                    max_days_approvati: newVal,
+                    stato: 'Confermato',
+                    updated_at: new Date()
+                }, { onConflict: 'email_dipendente' });
+
+            if (error) {
+                alert('Errore durante il salvataggio: ' + error.message);
+            } else {
+                alert('Valore salvato con successo per ' + email);
+            }
+        }
+    </script>
+</body>
+</html>
