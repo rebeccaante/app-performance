@@ -185,9 +185,9 @@
 
     <script>
         // --- CONFIGURAZIONE SUPABASE ---
-        const SUPABASE_URL = 'https://IL_TUO_PROJECT_REF.supabase.co';
+        const SUPABASE_URL = 'https://icwvqpdhloeegwcgmgpa.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_3JQdZmfHynkXkDT8t-0sxQ_1vZ13u9r';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- LINKS GOOGLE FORMS ---
         const FORM_COORDINATOR = 'https://forms.gle/kFVf7fZQ29R1iWyG9';
@@ -235,7 +235,7 @@
             const msg = document.getElementById('msg-routing');
             msg.classList.add('hidden');
 
-            const { data: user, error } = await supabase
+            const { data: user, error } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
                 .eq('email', email)
@@ -276,7 +276,7 @@
                 return;
             }
 
-            const { data: coordUser } = await supabase
+            const { data: coordUser } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
                 .eq('email', email)
@@ -304,7 +304,7 @@
             const tbody = document.getElementById('team-table-body');
             tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
 
-            const { data: teamMembers } = await supabase
+            const { data: teamMembers } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
                 .ilike('referente', `%${coordCognome}%`);
@@ -315,7 +315,7 @@
             }
 
             const emails = teamMembers.map(m => m.email);
-            const { data: responses } = await supabase
+            const { data: responses } = await supabaseClient
                 .from('risposte_valutazioni')
                 .select('*')
                 .in('email_dipendente', emails);
@@ -351,7 +351,7 @@
 
         async function saveValuation(email, memberId) {
             const newVal = parseInt(document.getElementById(`val-${memberId}`).value, 10);
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('risposte_valutazioni')
                 .upsert({ email_dipendente: email, max_days_approvati: newVal, stato: 'Confermato', updated_at: new Date() }, { onConflict: 'email_dipendente' });
 
@@ -394,8 +394,8 @@
         let allResponsesCache = {};
 
         async function loadHRData() {
-            const { data: dipendenti } = await supabase.from('dipendenti').select('*').order('cognome');
-            const { data: responses } = await supabase.from('risposte_valutazioni').select('*');
+            const { data: dipendenti } = await supabaseClient.from('dipendenti').select('*').order('cognome');
+            const { data: responses } = await supabaseClient.from('risposte_valutazioni').select('*');
 
             allDipendentiCache = dipendenti || [];
             allResponsesCache = {};
@@ -511,10 +511,8 @@
                     'Business Unit': m.bu || '',
                     'Team': m.team || '',
                     'Referente': m.referente || '',
-                    // --- DATI AUTOVALUTAZIONE DIPENDENTE ---
                     'Stato Autovalutazione': haRisposto ? 'Completato' : 'In attesa',
                     'Risposta Dipendente (Valore Proposto)': resp.max_days_proposti ?? 'Non compilato',
-                    // --- DATI FEEDBACK / CONFERMA REFERENTE ---
                     'Stato Feedback Referente': statoValidazioneRef,
                     'Valore Finale (Confermato/Modificato)': resp.max_days_approvati ?? (haRisposto ? resp.max_days_proposti : 'In attesa'),
                     'Note Coordinator': resp.note_coordinator || '',
