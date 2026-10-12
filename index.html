@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App Performance & Area Coordinator</title>
+    <title>App Performance - Area Personale, Coordinator & HR</title>
     <!-- Tailwind CSS per la grafica -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Client Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Libreria SheetJS per Esportazione Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
-    <div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="max-w-6xl mx-auto py-8 px-4">
         <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-300 mb-8">
-            <button id="tab-personale" onclick="switchTab('personale')" class="py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none">
+        <div class="flex border-b border-slate-300 mb-8 bg-white rounded-t-xl px-4 pt-2 shadow-sm">
+            <button id="tab-personale" onclick="switchTab('personale')" class="py-3 px-6 text-sm md:text-base font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none">
                 1. Area Personale
             </button>
-            <button id="tab-coordinator" onclick="switchTab('coordinator')" class="py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none">
+            <button id="tab-coordinator" onclick="switchTab('coordinator')" class="py-3 px-6 text-sm md:text-base font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none">
                 2. Area Coordinator
+            </button>
+            <button id="tab-hr" onclick="switchTab('hr')" class="py-3 px-6 text-sm md:text-base font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none">
+                3. Area HR
             </button>
         </div>
 
@@ -60,7 +65,7 @@
                 <div id="coord-login-msg" class="text-sm font-medium text-red-600 hidden"></div>
             </div>
 
-            <!-- Dashboard Team (Visibile dopo il login) -->
+            <!-- Dashboard Team -->
             <div id="coordinator-dashboard" class="hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
                     <div>
@@ -82,10 +87,97 @@
                                 <th class="p-3">Azione</th>
                             </tr>
                         </thead>
-                        <tbody id="team-table-body" class="divide-y divide-slate-200 text-sm">
-                            <!-- Popolato dinamicamente da JS -->
-                        </tbody>
+                        <tbody id="team-table-body" class="divide-y divide-slate-200 text-sm"></tbody>
                     </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: AREA HR -->
+        <div id="section-hr" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 hidden">
+            <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Risorse Umane (HR)</h1>
+            <p class="text-slate-600 mb-6">Pannello di controllo riservato al team HR per la verifica globale dell'avanzamento.</p>
+
+            <!-- Login HR -->
+            <div id="hr-login-box" class="max-w-md space-y-4">
+                <div>
+                    <label for="hr-email" class="block text-sm font-medium text-slate-700 mb-1">Email HR Autorizzata</label>
+                    <input type="email" id="hr-email" placeholder="chiara.pizzorno@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <div>
+                    <label for="hr-password" class="block text-sm font-medium text-slate-700 mb-1">Password HR</label>
+                    <input type="password" id="hr-password" placeholder="••••••••" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                </div>
+                <button onclick="loginHR()" class="w-full bg-indigo-700 hover:bg-indigo-800 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                    Accedi al Pannello HR
+                </button>
+                <div id="hr-login-msg" class="text-sm font-medium text-red-600 hidden"></div>
+            </div>
+
+            <!-- Dashboard HR -->
+            <div id="hr-dashboard" class="hidden">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                    <h2 class="text-xl font-bold text-slate-800">Dashboard Risorse Umane</h2>
+                    <button onclick="logoutHR()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                </div>
+
+                <!-- Sub-Tabs HR -->
+                <div class="flex gap-4 border-b border-slate-200 mb-6">
+                    <button id="subtab-autoval" onclick="switchHRSubtab('autoval')" class="pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">
+                        1. Autovalutazioni Dipendenti
+                    </button>
+                    <button id="subtab-referenti" onclick="switchHRSubtab('referenti')" class="pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700">
+                        2. Feedback Referenti
+                    </button>
+                </div>
+
+                <!-- HR Sub-Section 1: Autovalutazioni -->
+                <div id="hr-sub-autoval">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                        <input type="text" id="hr-search-dip" onkeyup="filterHRDipendenti()" placeholder="Cerca dipendente..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
+                        <button onclick="exportAutovalutazioniExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
+                            📊 Scarica Excel Autovalutazioni e Risposte
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[500px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="sticky top-0 bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
+                                <tr>
+                                    <th class="p-3">Dipendente</th>
+                                    <th class="p-3">Email</th>
+                                    <th class="p-3">Referente</th>
+                                    <th class="p-3 text-center">Stato Autovalutazione</th>
+                                    <th class="p-3 text-center">Valore Proposto Dipendente</th>
+                                    <th class="p-3 text-center">Valore Finale Referente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hr-table-autoval" class="divide-y divide-slate-200 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- HR Sub-Section 2: Feedback Referenti -->
+                <div id="hr-sub-referenti" class="hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-bold text-slate-700">Stato Feedback per Referente</h3>
+                        <button onclick="exportReferentiExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
+                            📊 Scarica Excel Avanzamento Referenti
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
+                                <tr>
+                                    <th class="p-3">Referente</th>
+                                    <th class="p-3 text-center">Membri Team</th>
+                                    <th class="p-3 text-center">Autovalutazioni Inviate</th>
+                                    <th class="p-3 text-center">Feedback Convalidati</th>
+                                    <th class="p-3 text-center">Stato Completamento</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hr-table-referenti" class="divide-y divide-slate-200 text-sm"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,36 +185,50 @@
 
     <script>
         // --- CONFIGURAZIONE SUPABASE ---
-        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL'; // Sostituisci con il tuo URL Supabase
-        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // Sostituisci con la Publishable/Anon Key
+        const SUPABASE_URL = 'https://IL_TUO_PROJECT_REF.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_3JQdZmfHynkXkDT8t-0sxQ_1vZ13u9r';
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- LINK GOOGLE FORMS ---
+        // --- LINKS GOOGLE FORMS ---
         const FORM_COORDINATOR = 'https://forms.gle/kFVf7fZQ29R1iWyG9';
         const FORM_CONSULENTI = 'https://forms.gle/5mvhoogatn8mkfmGA';
         const FORM_GENERALE = 'https://forms.gle/ZgR3t5SwTnQ8zsj69';
 
-        // --- SWAP TABS ---
-        function switchTab(tab) {
-            const secPersonale = document.getElementById('section-personale');
-            const secCoordinator = document.getElementById('section-coordinator');
-            const btnPersonale = document.getElementById('tab-personale');
-            const btnCoordinator = document.getElementById('tab-coordinator');
+        // --- AUTORIZZAZIONI HR ---
+        const HR_ALLOWED_EMAILS = [
+            'rebecca.antenozio@hqe.it',
+            'chiara.pizzorno@hqe.it',
+            'gianluca.luccini@hqe.it',
+            'pietro.malcotti@hqe.it'
+        ];
 
-            if (tab === 'personale') {
-                secPersonale.classList.remove('hidden');
-                secCoordinator.classList.add('hidden');
-                btnPersonale.className = 'py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
-                btnCoordinator.className = 'py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none';
-            } else {
-                secPersonale.classList.add('hidden');
-                secCoordinator.classList.remove('hidden');
-                btnCoordinator.className = 'py-3 px-6 text-lg font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
-                btnPersonale.className = 'py-3 px-6 text-lg font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none';
-            }
+        // --- TABS SWITCHING ---
+        function switchTab(tab) {
+            ['personale', 'coordinator', 'hr'].forEach(t => {
+                document.getElementById(`section-${t}`).classList.add('hidden');
+                const btn = document.getElementById(`tab-${t}`);
+                btn.className = 'py-3 px-6 text-sm md:text-base font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700 focus:outline-none';
+            });
+            document.getElementById(`section-${tab}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-${tab}`);
+            activeBtn.className = 'py-3 px-6 text-sm md:text-base font-semibold border-b-2 border-indigo-600 text-indigo-600 focus:outline-none';
         }
 
-        // --- SEZIONE 1: LOGICA ROUTING ---
+        function switchHRSubtab(subtab) {
+            const isAutoval = subtab === 'autoval';
+            document.getElementById('hr-sub-autoval').classList.toggle('hidden', !isAutoval);
+            document.getElementById('hr-sub-referenti').classList.toggle('hidden', isAutoval);
+
+            document.getElementById('subtab-autoval').className = isAutoval 
+                ? 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600' 
+                : 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
+
+            document.getElementById('subtab-referenti').className = !isAutoval 
+                ? 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600' 
+                : 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
+        }
+
+        // --- ROUTING AREA PERSONALE ---
         async function handleRouting(e) {
             e.preventDefault();
             const email = document.getElementById('user-email').value.trim().toLowerCase();
@@ -136,7 +242,7 @@
                 .maybeSingle();
 
             if (error || !user) {
-                msg.textContent = 'Email non trovata nell\'anagrafica aziendale. Controlla e riprova.';
+                msg.textContent = 'Email non trovata nell\'anagrafica aziendale.';
                 msg.className = 'mt-4 text-sm font-medium text-red-600';
                 msg.classList.remove('hidden');
                 return;
@@ -154,12 +260,10 @@
                 } else {
                     window.location.href = FORM_GENERALE;
                 }
-            }, 1000);
+            }, 800);
         }
 
-        // --- SEZIONE 2: LOGICA AREA COORDINATOR ---
-        let currentCoordinator = null;
-
+        // --- LOGIN COORDINATOR ---
         async function loginCoordinator() {
             const email = document.getElementById('coord-email').value.trim().toLowerCase();
             const pass = document.getElementById('coord-password').value.trim();
@@ -172,29 +276,25 @@
                 return;
             }
 
-            // Verifica se l'utente è nell'anagrafica
-            const { data: coordUser, error } = await supabase
+            const { data: coordUser } = await supabase
                 .from('dipendenti')
                 .select('*')
                 .eq('email', email)
                 .maybeSingle();
 
-            if (error || !coordUser) {
+            if (!coordUser) {
                 msg.textContent = 'Email non trovata nell\'anagrafica.';
                 msg.classList.remove('hidden');
                 return;
             }
 
-            currentCoordinator = coordUser;
             document.getElementById('coordinator-login-box').classList.add('hidden');
             document.getElementById('coordinator-dashboard').classList.remove('hidden');
             document.getElementById('welcome-coord').textContent = `Team di ${coordUser.nome} ${coordUser.cognome}`;
-
             loadTeamData(coordUser.cognome);
         }
 
         function logoutCoordinator() {
-            currentCoordinator = null;
             document.getElementById('coordinator-login-box').classList.remove('hidden');
             document.getElementById('coordinator-dashboard').classList.add('hidden');
             document.getElementById('coord-password').value = '';
@@ -204,47 +304,43 @@
             const tbody = document.getElementById('team-table-body');
             tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
 
-            // Trova tutti i dipendenti dove referente equivale al cognome del coordinator
-            const { data: teamMembers, error } = await supabase
+            const { data: teamMembers } = await supabase
                 .from('dipendenti')
                 .select('*')
                 .ilike('referente', `%${coordCognome}%`);
 
-            if (error || !teamMembers || teamMembers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nessun dipendente trovato per il referente "${coordCognome}".</td></tr>`;
+            if (!teamMembers || teamMembers.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nessun dipendente associato a te come referente.</td></tr>`;
                 return;
             }
 
-            // Recupera le risposte eventualmente inviate
             const emails = teamMembers.map(m => m.email);
             const { data: responses } = await supabase
                 .from('risposte_valutazioni')
                 .select('*')
                 .in('email_dipendente', emails);
 
-            const responseMap = {};
-            if (responses) {
-                responses.forEach(r => { responseMap[r.email_dipendente] = r; });
-            }
+            const respMap = {};
+            if (responses) responses.forEach(r => respMap[r.email_dipendente] = r);
 
             tbody.innerHTML = '';
-            teamMembers.forEach(member => {
-                const resp = responseMap[member.email] || {};
+            teamMembers.forEach(m => {
+                const resp = respMap[m.email] || {};
                 const maxProposto = resp.max_days_proposti !== undefined ? resp.max_days_proposti : '-';
-                const maxApprovato = resp.max_days_approvati !== undefined ? resp.max_days_approvati : (resp.max_days_proposti || member.max_days || 4);
+                const maxApprovato = resp.max_days_approvati !== undefined ? resp.max_days_approvati : (m.max_days || 4);
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
                 tr.innerHTML = `
-                    <td class="p-3 font-medium text-slate-900">${member.cognome} ${member.nome}</td>
-                    <td class="p-3 text-slate-600">${member.email}</td>
-                    <td class="p-3 text-slate-500">${member.bu || '-'} / ${member.team || '-'}</td>
+                    <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
+                    <td class="p-3 text-slate-600">${m.email}</td>
+                    <td class="p-3 text-slate-500">${m.bu || '-'} / ${m.team || '-'}</td>
                     <td class="p-3 text-center font-semibold text-slate-700">${maxProposto}</td>
                     <td class="p-3 text-center">
-                        <input type="number" id="val-${member.id}" value="${maxApprovato}" min="0" max="30" class="w-16 p-1 text-center border border-slate-300 rounded focus:ring-1 focus:ring-indigo-500">
+                        <input type="number" id="val-${m.id}" value="${maxApprovato}" class="w-16 p-1 text-center border border-slate-300 rounded">
                     </td>
                     <td class="p-3">
-                        <button onclick="saveMemberValuation('${member.email}', ${member.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded transition-colors">
+                        <button onclick="saveValuation('${m.email}', ${m.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded">
                             Salva
                         </button>
                     </td>
@@ -253,23 +349,227 @@
             });
         }
 
-        async function saveMemberValuation(email, memberId) {
+        async function saveValuation(email, memberId) {
             const newVal = parseInt(document.getElementById(`val-${memberId}`).value, 10);
-            
             const { error } = await supabase
                 .from('risposte_valutazioni')
-                .upsert({
-                    email_dipendente: email,
-                    max_days_approvati: newVal,
-                    stato: 'Confermato',
-                    updated_at: new Date()
-                }, { onConflict: 'email_dipendente' });
+                .upsert({ email_dipendente: email, max_days_approvati: newVal, stato: 'Confermato', updated_at: new Date() }, { onConflict: 'email_dipendente' });
 
-            if (error) {
-                alert('Errore durante il salvataggio: ' + error.message);
-            } else {
-                alert('Valore salvato con successo per ' + email);
+            if (error) alert('Errore: ' + error.message);
+            else alert('Valore salvato con successo per ' + email);
+        }
+
+        // --- LOGIN & DASHBOARD HR ---
+        async function loginHR() {
+            const email = document.getElementById('hr-email').value.trim().toLowerCase();
+            const pass = document.getElementById('hr-password').value.trim();
+            const msg = document.getElementById('hr-login-msg');
+            msg.classList.add('hidden');
+
+            if (!HR_ALLOWED_EMAILS.includes(email)) {
+                msg.textContent = 'Accesso non autorizzato. Indirizzo email non presente nella lista HR.';
+                msg.classList.remove('hidden');
+                return;
             }
+
+            if (pass !== 'lunapark') {
+                msg.textContent = 'Password HR errata.';
+                msg.classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('hr-login-box').classList.add('hidden');
+            document.getElementById('hr-dashboard').classList.remove('hidden');
+
+            loadHRData();
+        }
+
+        function logoutHR() {
+            document.getElementById('hr-login-box').classList.remove('hidden');
+            document.getElementById('hr-dashboard').classList.add('hidden');
+            document.getElementById('hr-password').value = '';
+        }
+
+        let allDipendentiCache = [];
+        let allResponsesCache = {};
+
+        async function loadHRData() {
+            const { data: dipendenti } = await supabase.from('dipendenti').select('*').order('cognome');
+            const { data: responses } = await supabase.from('risposte_valutazioni').select('*');
+
+            allDipendentiCache = dipendenti || [];
+            allResponsesCache = {};
+            if (responses) responses.forEach(r => allResponsesCache[r.email_dipendente] = r);
+
+            renderHRAutovalutazioni();
+            renderHRReferenti();
+        }
+
+        function renderHRAutovalutazioni() {
+            const tbody = document.getElementById('hr-table-autoval');
+            tbody.innerHTML = '';
+
+            allDipendentiCache.forEach(m => {
+                const resp = allResponsesCache[m.email];
+                const completato = resp && resp.max_days_proposti !== undefined;
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b dip-row';
+                tr.setAttribute('data-search', `${m.cognome} ${m.nome} ${m.email}`.toLowerCase());
+
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
+                    <td class="p-3 text-slate-600">${m.email}</td>
+                    <td class="p-3 text-slate-500">${m.referente || '-'}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${completato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${completato ? 'Completato' : 'In attesa'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center font-bold text-slate-700">${resp ? (resp.max_days_proposti ?? '-') : '-'}</td>
+                    <td class="p-3 text-center font-bold text-indigo-700">${resp ? (resp.max_days_approvati ?? '-') : '-'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderHRReferenti() {
+            const tbody = document.getElementById('hr-table-referenti');
+            tbody.innerHTML = '';
+
+            const referentiMap = {};
+            allDipendentiCache.forEach(d => {
+                if (d.referente) {
+                    const refName = d.referente.trim();
+                    if (!referentiMap[refName]) referentiMap[refName] = [];
+                    referentiMap[refName].push(d);
+                }
+            });
+
+            Object.keys(referentiMap).forEach(refName => {
+                const team = referentiMap[refName];
+                const totalTeam = team.length;
+                let autovalInviate = 0;
+                let confirmedCount = 0;
+
+                team.forEach(m => {
+                    const resp = allResponsesCache[m.email];
+                    if (resp && resp.max_days_proposti !== undefined) autovalInviate++;
+                    if (resp && (resp.stato === 'Confermato' || resp.max_days_approvati !== undefined)) {
+                        confirmedCount++;
+                    }
+                });
+
+                const percent = Math.round((confirmedCount / totalTeam) * 100);
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 border-b';
+                tr.innerHTML = `
+                    <td class="p-3 font-medium text-slate-900">${refName}</td>
+                    <td class="p-3 text-center font-semibold">${totalTeam}</td>
+                    <td class="p-3 text-center font-semibold text-slate-700">${autovalInviate} / ${totalTeam}</td>
+                    <td class="p-3 text-center font-semibold text-indigo-600">${confirmedCount} / ${totalTeam}</td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${percent === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
+                            ${percent}% Completato
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterHRDipendenti() {
+            const query = document.getElementById('hr-search-dip').value.toLowerCase();
+            const rows = document.querySelectorAll('.dip-row');
+            rows.forEach(r => {
+                const text = r.getAttribute('data-search');
+                r.style.display = text.includes(query) ? '' : 'none';
+            });
+        }
+
+        // --- FUNZIONI DI ESPORTAZIONE EXCEL (.XLSX) ---
+        function exportAutovalutazioniExcel() {
+            const dataToExport = allDipendentiCache.map(m => {
+                const resp = allResponsesCache[m.email] || {};
+                const haRisposto = resp.max_days_proposti !== undefined;
+                const haValidatoReferente = resp.max_days_approvati !== undefined || resp.stato === 'Confermato';
+
+                let statoValidazioneRef = 'In attesa di validazione';
+                if (haValidatoReferente) {
+                    if (resp.max_days_proposti !== undefined && resp.max_days_approvati !== resp.max_days_proposti) {
+                        statoValidazioneRef = 'Modificato dal Referente';
+                    } else {
+                        statoValidazioneRef = 'Confermato dal Referente';
+                    }
+                }
+
+                return {
+                    'Cognome': m.cognome,
+                    'Nome': m.nome,
+                    'Email Aziendale': m.email,
+                    'Business Unit': m.bu || '',
+                    'Team': m.team || '',
+                    'Referente': m.referente || '',
+                    // --- DATI AUTOVALUTAZIONE DIPENDENTE ---
+                    'Stato Autovalutazione': haRisposto ? 'Completato' : 'In attesa',
+                    'Risposta Dipendente (Valore Proposto)': resp.max_days_proposti ?? 'Non compilato',
+                    // --- DATI FEEDBACK / CONFERMA REFERENTE ---
+                    'Stato Feedback Referente': statoValidazioneRef,
+                    'Valore Finale (Confermato/Modificato)': resp.max_days_approvati ?? (haRisposto ? resp.max_days_proposti : 'In attesa'),
+                    'Note Coordinator': resp.note_coordinator || '',
+                    'Data Ultimo Aggiornamento': resp.updated_at ? new Date(resp.updated_at).toLocaleString('it-IT') : '-'
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Risposte e Conferme');
+            XLSX.writeFile(workbook, 'Report_HR_Autovalutazioni_e_Conferme.xlsx');
+        }
+
+        function exportReferentiExcel() {
+            const referentiMap = {};
+            allDipendentiCache.forEach(d => {
+                if (d.referente) {
+                    const refName = d.referente.trim();
+                    if (!referentiMap[refName]) referentiMap[refName] = [];
+                    referentiMap[refName].push(d);
+                }
+            });
+
+            const dataToExport = Object.keys(referentiMap).map(refName => {
+                const team = referentiMap[refName];
+                const totalTeam = team.length;
+                let autovalutazioniInviate = 0;
+                let feedbackConvalidati = 0;
+
+                team.forEach(m => {
+                    const resp = allResponsesCache[m.email];
+                    if (resp && resp.max_days_proposti !== undefined) {
+                        autovalutazioniInviate++;
+                    }
+                    if (resp && (resp.stato === 'Confermato' || resp.max_days_approvati !== undefined)) {
+                        feedbackConvalidati++;
+                    }
+                });
+
+                const percent = Math.round((feedbackConvalidati / totalTeam) * 100);
+
+                return {
+                    'Referente / Coordinator': refName,
+                    'Membri Totali Team': totalTeam,
+                    'Autovalutazioni Ricevute': `${autovalutazioniInviate} / ${totalTeam}`,
+                    'Feedback Convalidati dal Referente': `${feedbackConvalidati} / ${totalTeam}`,
+                    'Avanzamento Validazione (%)': `${percent}%`,
+                    'Stato Team': percent === 100 ? 'Completato' : 'In corso'
+                };
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Stato Referenti');
+            XLSX.writeFile(workbook, 'Report_HR_Stato_Referenti.xlsx');
         }
     </script>
 </body>
