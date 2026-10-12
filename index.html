@@ -253,7 +253,7 @@
             msg.className = 'mt-4 text-sm font-medium text-green-600';
             msg.classList.remove('hidden');
 
-            // 2. Verifica dinamica se è referente di qualcuno
+            // 2. Controllo COORDINATOR: presente nel campo "referente" di almeno un dipendente
             const userCognome = user.cognome.trim();
             const { data: isReferenteForTeam } = await supabaseClient
                 .from('dipendenti')
@@ -261,21 +261,23 @@
                 .ilike('referente', `%${userCognome}%`)
                 .limit(1);
 
-            const isCoordinatorReal = (isReferenteForTeam && isReferenteForTeam.length > 0) || user.is_coordinator === true;
+            const isCoordinatorReal = isReferenteForTeam && isReferenteForTeam.length > 0;
 
+            // 3. Controllo CONSULENZA: solo se BU o Team contengono "CONSULENZA"
             const buUpper = (user.bu || '').toUpperCase();
             const teamUpper = (user.team || '').toUpperCase();
+            const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
 
             setTimeout(() => {
                 // A. Se è un Referente/Coordinator -> Modulo Coordinator
                 if (isCoordinatorReal) {
                     window.location.href = FORM_COORDINATOR;
                 } 
-                // B. Se appartiene a BU o Team Consulenza -> Modulo Consulenti
-                else if (buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA')) {
+                // B. Se BU o Team è CONSULENZA -> Modulo Consulenti
+                else if (isConsulenza) {
                     window.location.href = FORM_CONSULENTI;
                 } 
-                // C. Per tutti gli altri -> Modulo Generale
+                // C. Tutti gli altri -> Modulo Generale
                 else {
                     window.location.href = FORM_GENERALE;
                 }
