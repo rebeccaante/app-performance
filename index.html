@@ -29,19 +29,103 @@
 
         <!-- SECTION 1: AREA PERSONALE -->
         <div id="section-personale" class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
-            <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Personale - Valutazioni</h1>
-            <p class="text-slate-600 mb-6">Inserisci la tua email aziendale per accedere al modulo di valutazione riservato al tuo ruolo.</p>
-            
-            <form id="form-routing" onsubmit="handleRouting(event)" class="space-y-4 max-w-md">
-                <div>
-                    <label for="user-email" class="block text-sm font-medium text-slate-700 mb-1">Email Aziendale</label>
-                    <input type="email" id="user-email" required placeholder="nome.cognome@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+            <!-- Form Inserimento Email -->
+            <div id="personale-login-box">
+                <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Personale - Autovalutazione Performance</h1>
+                <p class="text-slate-600 mb-6">Inserisci la tua email aziendale per accedere alla tua scheda di autovalutazione dedicata.</p>
+                
+                <form onsubmit="checkAndLoadEvaluationForm(event)" class="space-y-4 max-w-md">
+                    <div>
+                        <label for="user-email" class="block text-sm font-medium text-slate-700 mb-1">Email Aziendale</label>
+                        <input type="email" id="user-email" required placeholder="nome.cognome@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                        Accedi alla Scheda di Valutazione
+                    </button>
+                </form>
+                <div id="msg-routing" class="mt-4 text-sm font-medium hidden"></div>
+            </div>
+
+            <!-- Scheda Valutazione Interna (Generata Dinamicamente) -->
+            <div id="evaluation-form-box" class="hidden">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                    <div>
+                        <span id="eval-role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 uppercase tracking-wide">
+                            Modulo
+                        </span>
+                        <h2 id="eval-user-name" class="text-xl font-bold text-slate-900 mt-2">Scheda di Autovalutazione</h2>
+                    </div>
+                    <button onclick="resetEvaluationForm()" class="text-sm text-slate-500 hover:text-slate-800 font-medium">Cambia Email</button>
                 </div>
-                <button type="submit" id="btn-submit-routing" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
-                    Vai al modulo dedicato
-                </button>
-            </form>
-            <div id="msg-routing" class="mt-4 text-sm font-medium hidden"></div>
+
+                <!-- Box Dati Anagrafici Precompilati -->
+                <div class="bg-indigo-50/60 p-4 rounded-lg border border-indigo-100 mb-6 text-sm grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <div><span class="font-semibold text-slate-600">Email:</span> <span id="info-email" class="font-medium text-slate-900"></span></div>
+                    <div><span class="font-semibold text-slate-600">Business Unit:</span> <span id="info-bu" class="font-medium text-slate-900"></span></div>
+                    <div><span class="font-semibold text-slate-600">Team:</span> <span id="info-team" class="font-medium text-slate-900"></span></div>
+                    <div><span class="font-semibold text-slate-600">Referente:</span> <span id="info-referente" class="font-medium text-slate-900"></span></div>
+                    <div id="box-team-gestito" class="hidden col-span-2"><span class="font-semibold text-indigo-700">Team Gestito (Coordinator):</span> <span id="info-team-gestito" class="font-medium text-indigo-900"></span></div>
+                </div>
+
+                <!-- Box Definizione Scala di Punteggio (1-5) -->
+                <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 mb-8">
+                    <h3 class="font-bold text-slate-800 mb-2 text-base">Gruppo AUTOVALUTAZIONE PERFORMANCE</h3>
+                    <p class="text-xs text-slate-600 mb-3">Rispondi alle seguenti domande utilizzando questa <strong>scala di punteggio</strong>:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                        <div class="bg-white p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900 block border-b pb-1 mb-1">1 Necessità di sensibile miglioramento</span>
+                            <span class="text-slate-600">I comportamenti denotano incapacità di agire in situazioni di normale quotidianità.</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900 block border-b pb-1 mb-1">2 Necessità di miglioramento</span>
+                            <span class="text-slate-600">Aree di significativo miglioramento pur apprezzando l'impegno e la buona volontà.</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900 block border-b pb-1 mb-1">3 Adeguato</span>
+                            <span class="text-slate-600">Adeguata padronanza e raggiungimento dei risultati attesi in complessità normale.</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900 block border-b pb-1 mb-1">4 Più che adeguato</span>
+                            <span class="text-slate-600">Consolidata padronanza mantenuta costante anche in situazioni di particolare complessità.</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded border border-slate-200">
+                            <span class="font-bold text-slate-900 block border-b pb-1 mb-1">5 Eccellente</span>
+                            <span class="text-slate-600">Padronanza talmente significativa da essere riconosciuta dai colleghi come modello da seguire.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <form onsubmit="submitEvaluation(event)" class="space-y-8">
+                    <!-- Domande dinamiche generate via JS -->
+                    <div id="dynamic-questions" class="space-y-6"></div>
+
+                    <!-- Sezione Workload e Smart Working -->
+                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 space-y-4">
+                        <h3 class="text-lg font-bold text-slate-800 border-b pb-2">PROPOSTA SMART WORKING & WORKLOAD</h3>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">
+                                Indicare il numero massimo di giornate mensili/settimanali di smart working proposte:
+                            </label>
+                            <input type="number" id="eval-max-days" min="0" max="10" value="4" required class="w-32 p-2 border border-slate-300 rounded-lg font-bold text-center text-lg focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-1">
+                                Note aggiuntive o motivazioni per il Referente/HR:
+                            </label>
+                            <textarea id="eval-notes" rows="3" placeholder="Inserisci eventuali osservazioni sul carico di lavoro o esigenze personali..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-4">
+                        <button type="submit" id="btn-submit-eval" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors text-base">
+                            Invia Autovalutazione
+                        </button>
+                    </div>
+                </form>
+                <div id="eval-submit-msg" class="mt-4 text-center text-sm font-medium hidden"></div>
+            </div>
         </div>
 
         <!-- SECTION 2: AREA COORDINATOR -->
@@ -269,11 +353,6 @@
         const SUPABASE_ANON_KEY = 'sb_publishable_3JQdZmfHynkXkDT8t-0sxQ_1vZ13u9r';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- LINKS GOOGLE FORMS ---
-        const FORM_COORDINATOR = 'https://forms.gle/kFVf7fZQ29R1iWyG9';
-        const FORM_CONSULENTI = 'https://forms.gle/5mvhoogatn8mkfmGA';
-        const FORM_GENERALE = 'https://forms.gle/ZgR3t5SwTnQ8zsj69';
-
         // --- AUTORIZZAZIONI HR ---
         const HR_ALLOWED_EMAILS = [
             'rebecca.antenozio@hqe.it',
@@ -281,6 +360,8 @@
             'gianluca.luccini@hqe.it',
             'pietro.malcotti@hqe.it'
         ];
+
+        let currentUser = null;
 
         // --- TABS SWITCHING ---
         function switchTab(tab) {
@@ -301,22 +382,19 @@
 
             ['autoval', 'referenti', 'anagrafica'].forEach(st => {
                 const btn = document.getElementById(`subtab-${st}`);
-                if (st === subtab) {
-                    btn.className = 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600';
-                } else {
-                    btn.className = 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
-                }
+                btn.className = st === subtab 
+                    ? 'pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600' 
+                    : 'pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700';
             });
         }
 
-        // --- ROUTING AREA PERSONALE ---
-        async function handleRouting(e) {
+        // --- AREA PERSONALE: CHECK ED ELABORAZIONE DOMANDE ---
+        async function checkAndLoadEvaluationForm(e) {
             e.preventDefault();
             const email = document.getElementById('user-email').value.trim().toLowerCase();
             const msg = document.getElementById('msg-routing');
             msg.classList.add('hidden');
 
-            // 1. Cerca l'utente per email dall'anagrafica aggiornata
             const { data: user, error } = await supabaseClient
                 .from('dipendenti')
                 .select('*')
@@ -330,34 +408,203 @@
                 return;
             }
 
-            msg.textContent = 'Reindirizzamento al modulo in corso...';
-            msg.className = 'mt-4 text-sm font-medium text-green-600';
-            msg.classList.remove('hidden');
+            currentUser = user;
 
-            // 2. Controllo COORDINATOR: presente nel campo "referente" di almeno un dipendente
+            // 1. Controllo COORDINATOR
             const userCognome = user.cognome.trim();
-            const { data: isReferenteForTeam } = await supabaseClient
+            const { data: teamManaged } = await supabaseClient
                 .from('dipendenti')
-                .select('id')
-                .ilike('referente', `%${userCognome}%`)
-                .limit(1);
+                .select('nome, cognome')
+                .ilike('referente', `%${userCognome}%`);
 
-            const isCoordinatorReal = isReferenteForTeam && isReferenteForTeam.length > 0;
+            const isCoordinator = teamManaged && teamManaged.length > 0;
 
-            // 3. Controllo CONSULENZA: solo se BU o Team contengono "CONSULENZA"
+            // 2. Controllo CONSULENZA
             const buUpper = (user.bu || '').toUpperCase();
             const teamUpper = (user.team || '').toUpperCase();
             const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
 
-            setTimeout(() => {
-                if (isCoordinatorReal) {
-                    window.location.href = FORM_COORDINATOR;
-                } else if (isConsulenza) {
-                    window.location.href = FORM_CONSULENTI;
+            let moduleCategory = 'GENERALE';
+            if (isCoordinator) moduleCategory = 'COORDINATOR';
+            else if (isConsulenza) moduleCategory = 'CONSULENZA';
+
+            // Popola Dati Anagrafica nel Form
+            document.getElementById('personale-login-box').classList.add('hidden');
+            document.getElementById('evaluation-form-box').classList.remove('hidden');
+
+            document.getElementById('eval-role-badge').textContent = `MODULO: ${moduleCategory}`;
+            document.getElementById('eval-user-name').textContent = `Scheda di Autovalutazione - ${user.nome} ${user.cognome}`;
+            
+            document.getElementById('info-email').textContent = user.email;
+            document.getElementById('info-bu').textContent = user.bu || '-';
+            document.getElementById('info-team').textContent = user.team || '-';
+            document.getElementById('info-referente').textContent = user.referente || '-';
+
+            const boxTeamGestito = document.getElementById('box-team-gestito');
+            if (isCoordinator) {
+                boxTeamGestito.classList.remove('hidden');
+                const memberNames = teamManaged.map(m => `${m.nome} ${m.cognome}`).join(', ');
+                document.getElementById('info-team-gestito').textContent = memberNames || 'Nessun membro rilevato';
+            } else {
+                boxTeamGestito.classList.add('hidden');
+            }
+
+            // Carica eventuali risposte preesistenti
+            const { data: existingResp } = await supabaseClient
+                .from('risposte_valutazioni')
+                .select('*')
+                .eq('email_dipendente', user.email)
+                .maybeSingle();
+
+            if (existingResp) {
+                document.getElementById('eval-max-days').value = existingResp.max_days_proposti ?? 4;
+                document.getElementById('eval-notes').value = existingResp.note_coordinator || '';
+            }
+
+            renderDynamicQuestions(moduleCategory, existingResp);
+        }
+
+        function resetEvaluationForm() {
+            document.getElementById('personale-login-box').classList.remove('hidden');
+            document.getElementById('evaluation-form-box').classList.add('hidden');
+            document.getElementById('user-email').value = '';
+            currentUser = null;
+        }
+
+        // --- DEFINIZIONE DOMANDE E STRUTTURA DELLE 3 SCHEDE ---
+        function renderDynamicQuestions(category, existingData) {
+            const container = document.getElementById('dynamic-questions');
+            container.innerHTML = '';
+
+            let questions = [];
+
+            if (category === 'CONSULENZA') {
+                questions = [
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze lavorative attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi di lavoro.', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e lavora in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'lavora in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nel lavoro, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
+                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, lavora in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
+                    { id: 'q11', cat: 'NOTE E RIFLESSIONI', title: 'ANNOTAZIONI SULL\'ATTIVITÀ IN CONSULENZA', desc: 'processi da migliorare, suggerimenti, riflessioni sull\'attività svolta...', type: 'text' }
+                ];
+            } else if (category === 'COORDINATOR') {
+                questions = [
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma gruppi compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
+                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Segue le direttive, rispetta la pianificazione e le scadenze assegnate', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a cooperare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
+                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
+                    { id: 'q12', cat: 'COMPETENZE DI RUOLO', title: 'LEADERSHIP', desc: 'ha un ruolo definito e riconosciuto di Leader, è esempio positivo per i collaboratori a lui/lei assegnati', type: 'scale' },
+                    { id: 'q13', cat: 'COMPETENZE DI RUOLO', title: 'GESTIONE DEL TEAM', desc: 'gestisce e motiva il proprio team, conosce i punti di forza e le lacune e concorre direttamente al raggiungimento degli obiettivi assegnati', type: 'scale' },
+                    { id: 'q14', cat: 'COMPETENZE DI RUOLO', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
+                    { id: 'q15', cat: 'COMPETENZE DI RUOLO', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
+                    { id: 'q16', cat: 'COMPETENZE DI RUOLO', title: 'DISCIPLINA', desc: 'E’ autorevole senza essere autoritario; incoraggia il rispetto delle regole e delle procedure aziendali. Ascolta le persone ma disincentiva le eccezioni', type: 'scale' },
+                    { id: 'q17', cat: 'COMPETENZE DI RUOLO', title: 'CONSAPEVOLEZZA DEL RUOLO', desc: 'E’ in grado di delegare determinate attività, supervisionando non tanto i compiti a livello quotidiano, quanto il rispetto dei valori dell’azienda e il raggiungimento degli obiettivi. Trasmette, comunicandole con il proprio esempio, la strategia e la cultura', type: 'scale' },
+                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, le strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
+                    { id: 'q19', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
+                ];
+            } else {
+                // GENERALE
+                questions = [
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma Team compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
+                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure, rispetta la pianificazione, arriva puntuale agli impegni e alle riunioni, dimostra fedeltà all\'organizzazione, rispetta gli obblighi legali e le normative di sicurezza richieste dal ruolo', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nelle attività, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a operare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
+                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
+                    { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
+                    { id: 'q13', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
+                    { id: 'q14', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
+                ];
+            }
+
+            questions.forEach((q, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white p-5 rounded-lg border border-slate-200 shadow-sm';
+
+                if (q.type === 'scale') {
+                    div.innerHTML = `
+                        <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">${q.cat}</div>
+                        <h4 class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</h4>
+                        <p class="text-xs text-slate-600 mb-4 leading-relaxed">${q.desc}</p>
+                        <div class="flex items-center gap-2 md:gap-6 bg-slate-50 p-3 rounded border border-slate-200 justify-between">
+                            <span class="text-xs text-slate-500 font-medium hidden md:inline">1 (Minimo)</span>
+                            <div class="flex gap-4 md:gap-8 mx-auto md:mx-0">
+                                ${[1, 2, 3, 4, 5].map(v => `
+                                    <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                        <input type="radio" name="\${q.id}" value="${v}" ${v === 4 ? 'checked' : ''} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                        <span class="text-xs font-bold text-slate-700">\${v}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                            <span class="text-xs text-slate-500 font-medium hidden md:inline">5 (Eccellente)</span>
+                        </div>
+                    `;
                 } else {
-                    window.location.href = FORM_GENERALE;
+                    div.innerHTML = `
+                        <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">${q.cat}</div>
+                        <h4 class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</h4>
+                        <p class="text-xs text-slate-600 mb-3">${q.desc}</p>
+                        <textarea name="${q.id}" id="${q.id}" rows="3" placeholder="Scrivi qui la tua risposta..." class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+                    `;
                 }
-            }, 800);
+                container.appendChild(div);
+            });
+        }
+
+        // --- SALVATAGGIO VALUTAZIONE SU SUPABASE ---
+        async function submitEvaluation(e) {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const btn = document.getElementById('btn-submit-eval');
+            const msg = document.getElementById('eval-submit-msg');
+            btn.disabled = true;
+            btn.textContent = 'Salvataggio in corso...';
+            msg.classList.add('hidden');
+
+            const maxDays = parseInt(document.getElementById('eval-max-days').value, 10);
+            const notes = document.getElementById('eval-notes').value.trim();
+
+            const payload = {
+                email_dipendente: currentUser.email,
+                max_days_proposti: maxDays,
+                note_coordinator: notes,
+                stato: 'Inviato',
+                updated_at: new Date()
+            };
+
+            const { error } = await supabaseClient
+                .from('risposte_valutazioni')
+                .upsert(payload, { onConflict: 'email_dipendente' });
+
+            btn.disabled = false;
+            btn.textContent = 'Invia Autovalutazione';
+
+            if (error) {
+                msg.textContent = 'Errore durante l\'invio: ' + error.message;
+                msg.className = 'mt-4 text-center text-sm font-medium text-red-600';
+            } else {
+                msg.textContent = '✅ Autovalutazione inviata con successo! La tua scheda è stata registrata.';
+                msg.className = 'mt-4 text-center text-sm font-medium text-emerald-600';
+            }
+            msg.classList.remove('hidden');
         }
 
         // --- LOGIN COORDINATOR ---
