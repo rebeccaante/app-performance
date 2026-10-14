@@ -86,7 +86,7 @@
                         </div>
                         <div class="bg-white p-2.5 rounded border border-slate-200">
                             <span class="font-bold text-slate-900 block border-b pb-1 mb-1">4 Più che adeguato</span>
-                            <span class="text-slate-600">Consolidata padronanza mantenuta costante anche in situazioni di particolare complessità.</span>
+                            <span class="text-slate-600">Consolidata padronanza mantenuta constante anche in situazioni di particolare complessità.</span>
                         </div>
                         <div class="bg-white p-2.5 rounded border border-slate-200">
                             <span class="font-bold text-slate-900 block border-b pb-1 mb-1">5 Eccellente</span>
@@ -99,26 +99,7 @@
                     <!-- Domande dinamiche generate via JS -->
                     <div id="dynamic-questions" class="space-y-6"></div>
 
-                    <!-- Sezione Workload e Smart Working -->
-                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200 space-y-4">
-                        <h3 class="text-lg font-bold text-slate-800 border-b pb-2">PROPOSTA SMART WORKING & WORKLOAD</h3>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">
-                                Indicare il numero massimo di giornate mensili/settimanali di smart working proposte:
-                            </label>
-                            <input type="number" id="eval-max-days" min="0" max="10" value="4" required class="w-32 p-2 border border-slate-300 rounded-lg font-bold text-center text-lg focus:ring-2 focus:ring-indigo-500">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-1">
-                                Note aggiuntive o motivazioni per il Referente/HR:
-                            </label>
-                            <textarea id="eval-notes" rows="3" placeholder="Inserisci eventuali osservazioni sul carico di lavoro o esigenze personali..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 text-sm"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end gap-4">
+                    <div class="flex justify-end gap-4 pt-4 border-t">
                         <button type="submit" id="btn-submit-eval" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors text-base">
                             Invia Autovalutazione
                         </button>
@@ -166,9 +147,8 @@
                                 <th class="p-3">Dipendente</th>
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Team / BU</th>
-                                <th class="p-3 text-center">Inviato da Dipendente</th>
-                                <th class="p-3 text-center">Confermato/Modificato</th>
-                                <th class="p-3">Azione</th>
+                                <th class="p-3 text-center">Stato Autovalutazione</th>
+                                <th class="p-3 text-center">Azione</th>
                             </tr>
                         </thead>
                         <tbody id="team-table-body" class="divide-y divide-slate-200 text-sm"></tbody>
@@ -234,8 +214,6 @@
                                     <th class="p-3">Email</th>
                                     <th class="p-3">Referente</th>
                                     <th class="p-3 text-center">Stato Autovalutazione</th>
-                                    <th class="p-3 text-center">Valore Proposto Dipendente</th>
-                                    <th class="p-3 text-center">Valore Finale Referente</th>
                                 </tr>
                             </thead>
                             <tbody id="hr-table-autoval" class="divide-y divide-slate-200 text-sm"></tbody>
@@ -258,7 +236,6 @@
                                     <th class="p-3">Referente</th>
                                     <th class="p-3 text-center">Membri Team</th>
                                     <th class="p-3 text-center">Autovalutazioni Inviate</th>
-                                    <th class="p-3 text-center">Feedback Convalidati</th>
                                     <th class="p-3 text-center">Stato Completamento</th>
                                 </tr>
                             </thead>
@@ -362,6 +339,7 @@
         ];
 
         let currentUser = null;
+        let currentQuestions = [];
 
         // --- TABS SWITCHING ---
         function switchTab(tab) {
@@ -456,12 +434,7 @@
                 .eq('email_dipendente', user.email)
                 .maybeSingle();
 
-            if (existingResp) {
-                document.getElementById('eval-max-days').value = existingResp.max_days_proposti ?? 4;
-                document.getElementById('eval-notes').value = existingResp.note_coordinator || '';
-            }
-
-            renderDynamicQuestions(moduleCategory, existingResp);
+            renderDynamicQuestions(moduleCategory, existingResp ? existingResp.risposte_json : null);
         }
 
         function resetEvaluationForm() {
@@ -472,14 +445,12 @@
         }
 
         // --- DEFINIZIONE DOMANDE E STRUTTURA DELLE 3 SCHEDE ---
-        function renderDynamicQuestions(category, existingData) {
+        function renderDynamicQuestions(category, savedAnswers) {
             const container = document.getElementById('dynamic-questions');
             container.innerHTML = '';
 
-            let questions = [];
-
             if (category === 'CONSULENZA') {
-                questions = [
+                currentQuestions = [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze lavorative attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi di lavoro.', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
@@ -493,7 +464,7 @@
                     { id: 'q11', cat: 'NOTE E RIFLESSIONI', title: 'ANNOTAZIONI SULL\'ATTIVITÀ IN CONSULENZA', desc: 'processi da migliorare, suggerimenti, riflessioni sull\'attività svolta...', type: 'text' }
                 ];
             } else if (category === 'COORDINATOR') {
-                questions = [
+                currentQuestions = [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma gruppi compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
@@ -516,7 +487,7 @@
                 ];
             } else {
                 // GENERALE
-                questions = [
+                currentQuestions = [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma Team compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
@@ -534,11 +505,13 @@
                 ];
             }
 
-            questions.forEach((q, idx) => {
+            currentQuestions.forEach((q, idx) => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-5 rounded-lg border border-slate-200 shadow-sm';
+                const savedVal = savedAnswers ? savedAnswers[q.id] : null;
 
                 if (q.type === 'scale') {
+                    const defaultScore = savedVal !== null && savedVal !== undefined ? parseInt(savedVal, 10) : 4;
                     div.innerHTML = `
                         <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">${q.cat}</div>
                         <h4 class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</h4>
@@ -548,7 +521,7 @@
                             <div class="flex gap-4 md:gap-8 mx-auto md:mx-0">
                                 ${[1, 2, 3, 4, 5].map(v => `
                                     <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                        <input type="radio" name="\${q.id}" value="${v}" ${v === 4 ? 'checked' : ''} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                        <input type="radio" name="\${q.id}" value="${v}" ${v === defaultScore ? 'checked' : ''} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
                                         <span class="text-xs font-bold text-slate-700">\${v}</span>
                                     </label>
                                 `).join('')}
@@ -557,11 +530,12 @@
                         </div>
                     `;
                 } else {
+                    const defaultText = savedVal || '';
                     div.innerHTML = `
                         <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">${q.cat}</div>
                         <h4 class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</h4>
                         <p class="text-xs text-slate-600 mb-3">${q.desc}</p>
-                        <textarea name="${q.id}" id="${q.id}" rows="3" placeholder="Scrivi qui la tua risposta..." class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <textarea name="${q.id}" id="${q.id}" rows="3" placeholder="Scrivi qui la tua risposta..." class="w-full p-3 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500">${defaultText}</textarea>
                     `;
                 }
                 container.appendChild(div);
@@ -579,13 +553,20 @@
             btn.textContent = 'Salvataggio in corso...';
             msg.classList.add('hidden');
 
-            const maxDays = parseInt(document.getElementById('eval-max-days').value, 10);
-            const notes = document.getElementById('eval-notes').value.trim();
+            const answersMap = {};
+            currentQuestions.forEach(q => {
+                if (q.type === 'scale') {
+                    const selected = document.querySelector(`input[name="${q.id}"]:checked`);
+                    answersMap[q.id] = selected ? parseInt(selected.value, 10) : 4;
+                } else {
+                    const textEl = document.getElementById(q.id);
+                    answersMap[q.id] = textEl ? textEl.value.trim() : '';
+                }
+            });
 
             const payload = {
                 email_dipendente: currentUser.email,
-                max_days_proposti: maxDays,
-                note_coordinator: notes,
+                risposte_json: answersMap,
                 stato: 'Inviato',
                 updated_at: new Date()
             };
@@ -646,7 +627,7 @@
 
         async function loadTeamData(coordCognome) {
             const tbody = document.getElementById('team-table-body');
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
 
             const { data: teamMembers } = await supabaseClient
                 .from('dipendenti')
@@ -654,7 +635,7 @@
                 .ilike('referente', `%${coordCognome}%`);
 
             if (!teamMembers || teamMembers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nessun dipendente associato a te come referente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nessun dipendente associato a te come referente.</td></tr>`;
                 return;
             }
 
@@ -670,8 +651,7 @@
             tbody.innerHTML = '';
             teamMembers.forEach(m => {
                 const resp = respMap[m.email] || {};
-                const maxProposto = resp.max_days_proposti !== undefined ? resp.max_days_proposti : '-';
-                const maxApprovato = resp.max_days_approvati !== undefined ? resp.max_days_approvati : (m.max_days || 4);
+                const haInviato = resp && resp.stato === 'Inviato';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
@@ -679,28 +659,19 @@
                     <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
                     <td class="p-3 text-slate-600">${m.email}</td>
                     <td class="p-3 text-slate-500">${m.bu || '-'} / ${m.team || '-'}</td>
-                    <td class="p-3 text-center font-semibold text-slate-700">${maxProposto}</td>
                     <td class="p-3 text-center">
-                        <input type="number" id="val-${m.id}" value="${maxApprovato}" class="w-16 p-1 text-center border border-slate-300 rounded">
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haInviato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${haInviato ? 'Completato' : 'In attesa'}
+                        </span>
                     </td>
-                    <td class="p-3">
-                        <button onclick="saveValuation('${m.email}', ${m.id})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded">
-                            Salva
+                    <td class="p-3 text-center">
+                        <button onclick="alert('Scheda completata da ${m.nome} ${m.cognome}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded">
+                            Visualizza Scheda
                         </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
-        }
-
-        async function saveValuation(email, memberId) {
-            const newVal = parseInt(document.getElementById(`val-${memberId}`).value, 10);
-            const { error } = await supabaseClient
-                .from('risposte_valutazioni')
-                .upsert({ email_dipendente: email, max_days_approvati: newVal, stato: 'Confermato', updated_at: new Date() }, { onConflict: 'email_dipendente' });
-
-            if (error) alert('Errore: ' + error.message);
-            else alert('Valore salvato con successo per ' + email);
         }
 
         // --- LOGIN & DASHBOARD HR ---
@@ -756,7 +727,7 @@
 
             allDipendentiCache.forEach(m => {
                 const resp = allResponsesCache[m.email];
-                const completato = resp && resp.max_days_proposti !== undefined;
+                const completato = resp && resp.stato === 'Inviato';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b dip-row';
@@ -771,8 +742,6 @@
                             ${completato ? 'Completato' : 'In attesa'}
                         </span>
                     </td>
-                    <td class="p-3 text-center font-bold text-slate-700">${resp ? (resp.max_days_proposti ?? '-') : '-'}</td>
-                    <td class="p-3 text-center font-bold text-indigo-700">${resp ? (resp.max_days_approvati ?? '-') : '-'}</td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -795,17 +764,13 @@
                 const team = referentiMap[refName];
                 const totalTeam = team.length;
                 let autovalInviate = 0;
-                let confirmedCount = 0;
 
                 team.forEach(m => {
                     const resp = allResponsesCache[m.email];
-                    if (resp && resp.max_days_proposti !== undefined) autovalInviate++;
-                    if (resp && (resp.stato === 'Confermato' || resp.max_days_approvati !== undefined)) {
-                        confirmedCount++;
-                    }
+                    if (resp && resp.stato === 'Inviato') autovalInviate++;
                 });
 
-                const percent = Math.round((confirmedCount / totalTeam) * 100);
+                const percent = Math.round((autovalInviate / totalTeam) * 100);
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
@@ -813,7 +778,6 @@
                     <td class="p-3 font-medium text-slate-900">${refName}</td>
                     <td class="p-3 text-center font-semibold">${totalTeam}</td>
                     <td class="p-3 text-center font-semibold text-slate-700">${autovalInviate} / ${totalTeam}</td>
-                    <td class="p-3 text-center font-semibold text-indigo-600">${confirmedCount} / ${totalTeam}</td>
                     <td class="p-3 text-center">
                         <span class="px-2 py-1 text-xs rounded-full font-semibold ${percent === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
                             ${percent}% Completato
@@ -953,17 +917,8 @@
         function exportAutovalutazioniExcel() {
             const dataToExport = allDipendentiCache.map(m => {
                 const resp = allResponsesCache[m.email] || {};
-                const haRisposto = resp.max_days_proposti !== undefined;
-                const haValidatoReferente = resp.max_days_approvati !== undefined || resp.stato === 'Confermato';
-
-                let statoValidazioneRef = 'In attesa di validazione';
-                if (haValidatoReferente) {
-                    if (resp.max_days_proposti !== undefined && resp.max_days_approvati !== resp.max_days_proposti) {
-                        statoValidazioneRef = 'Modificato dal Referente';
-                    } else {
-                        statoValidazioneRef = 'Confermato dal Referente';
-                    }
-                }
+                const haRisposto = resp.stato === 'Inviato';
+                const answers = resp.risposte_json || {};
 
                 return {
                     'Cognome': m.cognome,
@@ -973,18 +928,15 @@
                     'Team': m.team || '',
                     'Referente': m.referente || '',
                     'Stato Autovalutazione': haRisposto ? 'Completato' : 'In attesa',
-                    'Risposta Dipendente (Valore Proposto)': resp.max_days_proposti ?? 'Non compilato',
-                    'Stato Feedback Referente': statoValidazioneRef,
-                    'Valore Finale (Confermato/Modificato)': resp.max_days_approvati ?? (haRisposto ? resp.max_days_proposti : 'In attesa'),
-                    'Note Coordinator': resp.note_coordinator || '',
+                    'Dettaglio Risposte JSON': JSON.stringify(answers),
                     'Data Ultimo Aggiornamento': resp.updated_at ? new Date(resp.updated_at).toLocaleString('it-IT') : '-'
                 };
             });
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Risposte e Conferme');
-            XLSX.writeFile(workbook, 'Report_HR_Autovalutazioni_e_Conferme.xlsx');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Autovalutazioni');
+            XLSX.writeFile(workbook, 'Report_HR_Autovalutazioni.xlsx');
         }
 
         function exportReferentiExcel() {
@@ -1001,26 +953,21 @@
                 const team = referentiMap[refName];
                 const totalTeam = team.length;
                 let autovalutazioniInviate = 0;
-                let feedbackConvalidati = 0;
 
                 team.forEach(m => {
                     const resp = allResponsesCache[m.email];
-                    if (resp && resp.max_days_proposti !== undefined) {
+                    if (resp && resp.stato === 'Inviato') {
                         autovalutazioniInviate++;
-                    }
-                    if (resp && (resp.stato === 'Confermato' || resp.max_days_approvati !== undefined)) {
-                        feedbackConvalidati++;
                     }
                 });
 
-                const percent = Math.round((feedbackConvalidati / totalTeam) * 100);
+                const percent = Math.round((autovalutazioniInviate / totalTeam) * 100);
 
                 return {
                     'Referente / Coordinator': refName,
                     'Membri Totali Team': totalTeam,
                     'Autovalutazioni Ricevute': `${autovalutazioniInviate} / ${totalTeam}`,
-                    'Feedback Convalidati dal Referente': `${feedbackConvalidati} / ${totalTeam}`,
-                    'Avanzamento Validazione (%)': `${percent}%`,
+                    'Avanzamento (%)': `${percent}%`,
                     'Stato Team': percent === 100 ? 'Completato' : 'In corso'
                 };
             });
