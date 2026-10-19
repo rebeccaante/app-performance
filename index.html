@@ -116,7 +116,7 @@
             <div id="coordinator-login-box" class="max-w-md space-y-4">
                 <div>
                     <label for="coord-email" class="block text-sm font-medium text-slate-700 mb-1">Email Coordinator</label>
-                    <input type="email" id="coord-email" placeholder="chiara.pizzorno@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="email" id="coord-email" placeholder="" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
                     <label for="coord-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
@@ -169,7 +169,7 @@
             <div id="hr-login-box" class="max-w-md space-y-4">
                 <div>
                     <label for="hr-email" class="block text-sm font-medium text-slate-700 mb-1">Email HR Autorizzata</label>
-                    <input type="email" id="hr-email" placeholder="chiara.pizzorno@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <input type="email" id="hr-email" placeholder="" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                 </div>
                 <div>
                     <label for="hr-password" class="block text-sm font-medium text-slate-700 mb-1">Password HR</label>
@@ -367,7 +367,6 @@
         let activeTargetYear = 2026;
         let activeTargetQuestions = [];
 
-        // POPOLA I SELECT ANNI (2026 - 2060)
         function initYearSelects() {
             const selects = ['user-year', 'coord-year-select', 'hr-year-select'];
             selects.forEach(sId => {
@@ -508,7 +507,7 @@
                     { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
                     { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Segue le direttive, rispetta la pianificazione e le scadenze assegnate', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera productive anche in un ambiente stressante...', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri...', type: 'scale' },
                     { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente...', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività...', type: 'scale' },
@@ -530,7 +529,7 @@
                     { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
                     { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure...', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera productive anche in un ambiente stressante...', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri...', type: 'scale' },
                     { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative...', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo...', type: 'scale' },
@@ -740,6 +739,25 @@
                 }
             });
 
+            // AGGIUNTA AREA NOTE / COMMENTO DEL COORDINATOR ALLA FINE
+            const savedNote = coordAnswers['coord_notes'] || '';
+            if (isCoordinatorView) {
+                html += `
+                    <div class="bg-emerald-50/70 p-4 rounded-lg border border-emerald-200 shadow-sm mt-4">
+                        <div class="text-xs font-bold text-emerald-800 uppercase mb-1">NOTE E OSSERVAZIONI REFERENTE</div>
+                        <label for="coord_notes" class="block text-xs text-slate-700 font-semibold mb-2">Commenti o note aggiuntive sulla risorsa (opzionale):</label>
+                        <textarea id="coord_notes" rows="3" placeholder="Inserisci qui eventuali osservazioni sulla prestazione della risorsa..." class="w-full p-2.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 bg-white">${savedNote}</textarea>
+                    </div>
+                `;
+            } else if (showReferente && savedNote) {
+                html += `
+                    <div class="bg-emerald-50 p-4 rounded-lg border border-emerald-200 shadow-sm mt-4">
+                        <div class="text-xs font-bold text-emerald-800 uppercase mb-1">NOTE E OSSERVAZIONI REFERENTE</div>
+                        <div class="p-3 bg-white border border-slate-200 rounded text-slate-800 text-xs whitespace-pre-wrap">${savedNote}</div>
+                    </div>
+                `;
+            }
+
             contentEl.innerHTML = html;
 
             if (isCoordinatorView) {
@@ -795,6 +813,18 @@
                 return row;
             });
 
+            if (includeCoordinator && coordAnswers['coord_notes']) {
+                dataToExport.push({
+                    'N°': '-',
+                    'Anno': targetYear,
+                    'Categoria': 'NOTE REFERENTE',
+                    'Domanda': 'Commenti e note del Coordinator',
+                    'Descrizione': '-',
+                    'Voto Autovalutazione Risorsa': '-',
+                    'Voto Valutazione Referente': coordAnswers['coord_notes']
+                });
+            }
+
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
             const sheetName = includeCoordinator ? 'Scheda Comparativa' : 'Scheda Autovalutazione';
@@ -822,6 +852,11 @@
                     coordAnswersMap[q.id] = selected ? parseInt(selected.value, 10) : 4;
                 }
             });
+
+            const notesEl = document.getElementById('coord_notes');
+            if (notesEl) {
+                coordAnswersMap['coord_notes'] = notesEl.value.trim();
+            }
 
             const payload = {
                 email_dipendente: activeTargetEmail,
@@ -1293,6 +1328,7 @@
                     'Valutazione Coordinator Completata': resp.risposte_coordinator_json ? 'Sì' : 'No',
                     'Email Coordinator Valutatore': resp.email_coordinator || '-',
                     'Data Valutazione Coordinator': resp.data_valutazione_coordinator ? new Date(resp.data_valutazione_coordinator).toLocaleString('it-IT') : '-',
+                    'Note Coordinator': coordAnswers['coord_notes'] || '-',
                     'Dettaglio Valutazioni Coordinator JSON': JSON.stringify(coordAnswers)
                 };
             });
