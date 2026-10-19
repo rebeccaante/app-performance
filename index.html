@@ -212,29 +212,17 @@
                     </div>
                 </div>
 
-                <!-- HR Sub-Tab 2: Feedback Referenti -->
-                <div id="hr-sub-referenti" class="hidden">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-700">Stato Valutazioni Referenti & Dettaglio Comparativo</h3>
+                <!-- HR Sub-Tab 2: Feedback Referenti (Divisi per Team) -->
+                <div id="hr-sub-referenti" class="hidden space-y-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="font-bold text-slate-700">Valutazioni Raggruppate per Referente</h3>
                         <button onclick="exportReferentiExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
                             📊 Scarica Tutti in Excel
                         </button>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
-                                <tr>
-                                    <th class="p-3">Risorsa</th>
-                                    <th class="p-3">Email</th>
-                                    <th class="p-3">Referente</th>
-                                    <th class="p-3 text-center">Stato Autovalutazione</th>
-                                    <th class="p-3 text-center">Stato Valutazione Referente</th>
-                                    <th class="p-3 text-center">Azioni HR</th>
-                                </tr>
-                            </thead>
-                            <tbody id="hr-table-referenti-dettaglio" class="divide-y divide-slate-200 text-sm"></tbody>
-                        </table>
-                    </div>
+
+                    <!-- Container Dinamico Tabelle per Team -->
+                    <div id="hr-teams-container" class="space-y-6"></div>
                 </div>
 
                 <!-- HR Sub-Tab 3: Gestione Anagrafica -->
@@ -478,7 +466,7 @@
                     { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
                     { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Segue le direttive, rispetta la pianificazione e le scadenze assegnate', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera productive anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri...', type: 'scale' },
                     { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente...', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività...', type: 'scale' },
@@ -946,7 +934,7 @@
             if (responses) responses.forEach(r => allResponsesCache[r.email_dipendente] = r);
 
             renderHRAutovalutazioni();
-            renderHRReferentiDettaglio();
+            renderHRReferentiTeams();
             renderHRAnagrafica();
         }
 
@@ -984,41 +972,86 @@
             });
         }
 
-        function renderHRReferentiDettaglio() {
-            const tbody = document.getElementById('hr-table-referenti-dettaglio');
-            tbody.innerHTML = '';
+        // --- SUBTAB 2 HR: RAGGRUPPAMENTO PER REFERENTE / TEAM ---
+        function renderHRReferentiTeams() {
+            const container = document.getElementById('hr-teams-container');
+            container.innerHTML = '';
 
+            // Raggruppa le risorse in base al campo Referente
+            const teamsMap = {};
             allDipendentiCache.forEach(m => {
-                const resp = allResponsesCache[m.email];
-                const haAutovalutato = resp && resp.stato === 'Inviato';
-                const haValutatoCoord = resp && resp.risposte_coordinator_json;
+                const refName = m.referente ? m.referente.trim() : 'Senza Referente';
+                if (!teamsMap[refName]) teamsMap[refName] = [];
+                teamsMap[refName].push(m);
+            });
 
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-50 border-b';
-                tr.innerHTML = `
-                    <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
-                    <td class="p-3 text-slate-600">${m.email}</td>
-                    <td class="p-3 text-slate-500">${m.referente || '-'}</td>
-                    <td class="p-3 text-center">
-                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haAutovalutato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                            ${haAutovalutato ? 'Inviata' : 'In attesa'}
+            // Genera una card/tabella per ogni Referente
+            Object.keys(teamsMap).sort().forEach(refName => {
+                const members = teamsMap[refName];
+
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'bg-white p-5 rounded-xl border border-slate-200 shadow-sm';
+
+                let rowsHTML = '';
+                members.forEach(m => {
+                    const resp = allResponsesCache[m.email];
+                    const haAutovalutato = resp && resp.stato === 'Inviato';
+                    const haValutatoCoord = resp && resp.risposte_coordinator_json;
+
+                    rowsHTML += `
+                        <tr class="hover:bg-slate-50 border-b">
+                            <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
+                            <td class="p-3 text-slate-600">${m.email}</td>
+                            <td class="p-3 text-center">
+                                <span class="px-2 py-1 text-xs rounded-full font-semibold ${haAutovalutato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                    ${haAutovalutato ? 'Inviata' : 'In attesa'}
+                                </span>
+                            </td>
+                            <td class="p-3 text-center">
+                                <span class="px-2 py-1 text-xs rounded-full font-semibold ${haValutatoCoord ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}">
+                                    ${haValutatoCoord ? 'Valutato dal Referente' : 'In attesa'}
+                                </span>
+                            </td>
+                            <td class="p-3 text-center flex justify-center gap-2">
+                                <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                    👁️ Comparativa
+                                </button>
+                                <button onclick="downloadSingleSchedaExcel('${m.email}', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                    📥 Scarica Excel
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                cardDiv.innerHTML = `
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-indigo-100">
+                        <h4 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            👥 Team Referente: <span class="text-indigo-600">${refName}</span>
+                        </h4>
+                        <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-semibold">
+                            ${members.length} risors${members.length === 1 ? 'a' : 'e'}
                         </span>
-                    </td>
-                    <td class="p-3 text-center">
-                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haValutatoCoord ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}">
-                            ${haValutatoCoord ? 'Valutato dal Referente' : 'In attesa'}
-                        </span>
-                    </td>
-                    <td class="p-3 text-center flex justify-center gap-2">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
-                            👁️ Comparativa
-                        </button>
-                        <button onclick="downloadSingleSchedaExcel('${m.email}', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
-                            📥 Scarica Excel
-                        </button>
-                    </td>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 border-b text-xs uppercase text-slate-500 font-semibold">
+                                    <th class="p-3">Risorsa</th>
+                                    <th class="p-3">Email</th>
+                                    <th class="p-3 text-center">Stato Autovalutazione</th>
+                                    <th class="p-3 text-center">Stato Valutazione Referente</th>
+                                    <th class="p-3 text-center">Azioni HR</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-sm">
+                                ${rowsHTML}
+                            </tbody>
+                        </table>
+                    </div>
                 `;
-                tbody.appendChild(tr);
+
+                container.appendChild(cardDiv);
             });
         }
 
