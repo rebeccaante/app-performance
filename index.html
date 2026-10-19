@@ -31,9 +31,13 @@
         <div id="section-personale" class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
             <div id="personale-login-box">
                 <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Personale - Autovalutazione Performance</h1>
-                <p class="text-slate-600 mb-6">Inserisci la tua email aziendale per accedere alla tua scheda di autovalutazione dedicata.</p>
+                <p class="text-slate-600 mb-6">Seleziona l'anno e inserisci la tua email aziendale per accedere alla scheda di autovalutazione.</p>
                 
                 <form onsubmit="checkAndLoadEvaluationForm(event)" class="space-y-4 max-w-md">
+                    <div>
+                        <label for="user-year" class="block text-sm font-semibold text-slate-700 mb-1">📅 Anno di Riferimento</label>
+                        <select id="user-year" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-bold text-indigo-700"></select>
+                    </div>
                     <div>
                         <label for="user-email" class="block text-sm font-medium text-slate-700 mb-1">Email Aziendale</label>
                         <input type="email" id="user-email" required placeholder="nome.cognome@hqe.it" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
@@ -48,12 +52,13 @@
             <div id="evaluation-form-box" class="hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
                     <div>
-                        <span id="eval-role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 uppercase tracking-wide">
-                            Modulo
-                        </span>
+                        <div class="flex gap-2 items-center">
+                            <span id="eval-role-badge" class="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 uppercase tracking-wide">Modulo</span>
+                            <span id="eval-year-badge" class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Anno: 2026</span>
+                        </div>
                         <h2 id="eval-user-name" class="text-xl font-bold text-slate-900 mt-2">Scheda di Autovalutazione</h2>
                     </div>
-                    <button onclick="resetEvaluationForm()" class="text-sm text-slate-500 hover:text-slate-800 font-medium">Cambia Email</button>
+                    <button onclick="resetEvaluationForm()" class="text-sm text-slate-500 hover:text-slate-800 font-medium">Cambia Email / Anno</button>
                 </div>
 
                 <div class="bg-indigo-50/60 p-4 rounded-lg border border-indigo-100 mb-6 text-sm grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -124,12 +129,18 @@
             </div>
 
             <div id="coordinator-dashboard" class="hidden">
-                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b">
                     <div>
                         <h2 id="welcome-coord" class="text-xl font-bold text-slate-800">Team di ...</h2>
                         <p class="text-sm text-slate-500">Gestione e inserimento valutazioni per i componenti del team</p>
                     </div>
-                    <button onclick="logoutCoordinator()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label for="coord-year-select" class="text-xs font-bold text-slate-700 uppercase">Anno:</label>
+                            <select id="coord-year-select" onchange="onCoordYearChange()" class="px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-indigo-700 text-sm focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <button onclick="logoutCoordinator()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                    </div>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -171,9 +182,15 @@
             </div>
 
             <div id="hr-dashboard" class="hidden">
-                <div class="flex justify-between items-center mb-6 pb-4 border-b">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b">
                     <h2 class="text-xl font-bold text-slate-800">Dashboard Risorse Umane</h2>
-                    <button onclick="logoutHR()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label for="hr-year-select" class="text-xs font-bold text-slate-700 uppercase">Anno di Riferimento:</label>
+                            <select id="hr-year-select" onchange="onHRYearChange()" class="px-3 py-1.5 border border-slate-300 rounded-lg font-bold text-indigo-700 text-sm focus:ring-2 focus:ring-indigo-500"></select>
+                        </div>
+                        <button onclick="logoutHR()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
+                    </div>
                 </div>
 
                 <div class="flex flex-wrap gap-4 border-b border-slate-200 mb-6">
@@ -220,8 +237,6 @@
                             📊 Scarica Tutti in Excel
                         </button>
                     </div>
-
-                    <!-- Container Dinamico Tabelle per Team -->
                     <div id="hr-teams-container" class="space-y-6"></div>
                 </div>
 
@@ -344,8 +359,31 @@
 
         let currentUser = null;
         let currentCoordinatorUser = null;
+        let selectedYearPersonale = 2026;
+        let selectedYearCoord = 2026;
+        let selectedYearHR = 2026;
+
         let activeTargetEmail = null;
+        let activeTargetYear = 2026;
         let activeTargetQuestions = [];
+
+        // POPOLA I SELECT ANNI (2026 - 2060)
+        function initYearSelects() {
+            const selects = ['user-year', 'coord-year-select', 'hr-year-select'];
+            selects.forEach(sId => {
+                const sel = document.getElementById(sId);
+                if (!sel) return;
+                sel.innerHTML = '';
+                for (let y = 2026; y <= 2060; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    sel.appendChild(opt);
+                }
+                sel.value = 2026;
+            });
+        }
+        document.addEventListener('DOMContentLoaded', initYearSelects);
 
         function switchTab(tab) {
             ['personale', 'coordinator', 'hr'].forEach(t => {
@@ -374,6 +412,8 @@
         async function checkAndLoadEvaluationForm(e) {
             e.preventDefault();
             const email = document.getElementById('user-email').value.trim().toLowerCase();
+            selectedYearPersonale = parseInt(document.getElementById('user-year').value, 10);
+
             const msg = document.getElementById('msg-routing');
             msg.classList.add('hidden');
 
@@ -411,6 +451,7 @@
             document.getElementById('evaluation-form-box').classList.remove('hidden');
 
             document.getElementById('eval-role-badge').textContent = `MODULO: ${moduleCategory}`;
+            document.getElementById('eval-year-badge').textContent = `ANNO: ${selectedYearPersonale}`;
             document.getElementById('eval-user-name').textContent = `Scheda di Autovalutazione - ${user.nome} ${user.cognome}`;
             
             document.getElementById('info-email').textContent = user.email;
@@ -431,6 +472,7 @@
                 .from('risposte_valutazioni')
                 .select('*')
                 .eq('email_dipendente', user.email)
+                .eq('anno', selectedYearPersonale)
                 .maybeSingle();
 
             renderDynamicQuestions(moduleCategory, existingResp ? existingResp.risposte_json : null);
@@ -578,6 +620,7 @@
 
             const payload = {
                 email_dipendente: currentUser.email,
+                anno: selectedYearPersonale,
                 risposte_json: answersMap,
                 stato: 'Inviato',
                 updated_at: new Date()
@@ -585,7 +628,7 @@
 
             const { error } = await supabaseClient
                 .from('risposte_valutazioni')
-                .upsert(payload, { onConflict: 'email_dipendente' });
+                .upsert(payload, { onConflict: 'email_dipendente,anno' });
 
             btn.disabled = false;
             btn.textContent = 'Invia Autovalutazione';
@@ -594,16 +637,23 @@
                 msg.textContent = 'Errore durante l\'invio: ' + error.message;
                 msg.className = 'mt-4 text-center text-sm font-medium text-red-600';
             } else {
-                msg.textContent = '✅ Autovalutazione inviata con successo! La tua scheda è stata registrata.';
+                msg.textContent = `✅ Autovalutazione per l'anno ${selectedYearPersonale} inviata con successo!`;
                 msg.className = 'mt-4 text-center text-sm font-medium text-emerald-600';
             }
             msg.classList.remove('hidden');
         }
 
-        // --- VISUALIZZA SCHEDA IN MODALE (showReferente: true = Comparativa, false = Solo Autovalutazione) ---
-        async function viewMemberScheda(email, nome, cognome, bu, team, isCoordinatorView = false, showReferente = true) {
+        // --- VISUALIZZA SCHEDA IN MODALE ---
+        async function viewMemberScheda(email, nome, cognome, bu, team, isCoordinatorView = false, showReferente = true, targetYear = 2026) {
             activeTargetEmail = email;
-            const { data: resp } = await supabaseClient.from('risposte_valutazioni').select('*').eq('email_dipendente', email).maybeSingle();
+            activeTargetYear = targetYear;
+
+            const { data: resp } = await supabaseClient
+                .from('risposte_valutazioni')
+                .select('*')
+                .eq('email_dipendente', email)
+                .eq('anno', targetYear)
+                .maybeSingle();
 
             const titleEl = document.getElementById('modal-scheda-title');
             const subtitleEl = document.getElementById('modal-scheda-subtitle');
@@ -612,11 +662,11 @@
             const msgCoord = document.getElementById('modal-coordinator-msg');
 
             msgCoord.classList.add('hidden');
-            titleEl.textContent = (showReferente && !isCoordinatorView) ? `Scheda Comparativa - ${nome} ${cognome}` : `Scheda Autovalutazione - ${nome} ${cognome}`;
+            titleEl.textContent = (showReferente && !isCoordinatorView) ? `Scheda Comparativa (${targetYear}) - ${nome} ${cognome}` : `Scheda Autovalutazione (${targetYear}) - ${nome} ${cognome}`;
             subtitleEl.textContent = `Email: ${email} | BU: ${bu || '-'} | Team: ${team || '-'}`;
 
             if (!resp || !resp.risposte_json) {
-                contentEl.innerHTML = `<div class="p-6 text-center text-slate-500 font-medium">La risorsa non ha ancora inviato la scheda di autovalutazione.</div>`;
+                contentEl.innerHTML = `<div class="p-6 text-center text-slate-500 font-medium">La risorsa non ha ancora inviato la scheda di autovalutazione per l'anno ${targetYear}.</div>`;
                 btnSaveCoord.classList.add('hidden');
                 toggleViewSchedaModal(true);
                 return;
@@ -705,12 +755,17 @@
             window.print();
         }
 
-        async function downloadSingleSchedaExcel(email, includeCoordinator = false) {
+        async function downloadSingleSchedaExcel(email, includeCoordinator = false, targetYear = 2026) {
             const { data: user } = await supabaseClient.from('dipendenti').select('*').eq('email', email).maybeSingle();
-            const { data: resp } = await supabaseClient.from('risposte_valutazioni').select('*').eq('email_dipendente', email).maybeSingle();
+            const { data: resp } = await supabaseClient
+                .from('risposte_valutazioni')
+                .select('*')
+                .eq('email_dipendente', email)
+                .eq('anno', targetYear)
+                .maybeSingle();
 
             if (!resp || !resp.risposte_json) {
-                alert('Nessuna scheda compilata trovata per questa risorsa.');
+                alert(`Nessuna scheda compilata trovata per questa risorsa per l'anno ${targetYear}.`);
                 return;
             }
 
@@ -728,6 +783,7 @@
             const dataToExport = questions.map((q, idx) => {
                 const row = {
                     'N°': idx + 1,
+                    'Anno': targetYear,
                     'Categoria': q.cat,
                     'Domanda': q.title,
                     'Descrizione': q.desc,
@@ -745,8 +801,8 @@
             XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
             
             const fileName = includeCoordinator 
-                ? `Scheda_Comparativa_${user ? user.cognome : 'Risorsa'}_${user ? user.nome : ''}.xlsx`
-                : `Scheda_Autovalutazione_${user ? user.cognome : 'Risorsa'}_${user ? user.nome : ''}.xlsx`;
+                ? `Scheda_Comparativa_${targetYear}_${user ? user.cognome : 'Risorsa'}_${user ? user.nome : ''}.xlsx`
+                : `Scheda_Autovalutazione_${targetYear}_${user ? user.cognome : 'Risorsa'}_${user ? user.nome : ''}.xlsx`;
 
             XLSX.writeFile(workbook, fileName);
         }
@@ -769,6 +825,7 @@
 
             const payload = {
                 email_dipendente: activeTargetEmail,
+                anno: activeTargetYear,
                 risposte_coordinator_json: coordAnswersMap,
                 email_coordinator: currentCoordinatorUser.email,
                 data_valutazione_coordinator: new Date()
@@ -776,7 +833,7 @@
 
             const { error } = await supabaseClient
                 .from('risposte_valutazioni')
-                .upsert(payload, { onConflict: 'email_dipendente' });
+                .upsert(payload, { onConflict: 'email_dipendente,anno' });
 
             btn.disabled = false;
             btn.textContent = 'Invia Valutazione Coordinator';
@@ -785,7 +842,7 @@
                 msg.textContent = 'Errore durante il salvataggio: ' + error.message;
                 msg.className = 'text-xs font-medium text-center text-red-600 mb-2';
             } else {
-                msg.textContent = '✅ Valutazione inviata con successo! I dati sono stati trasmessi al team HR.';
+                msg.textContent = `✅ Valutazione per l'anno ${activeTargetYear} inviata con successo!`;
                 msg.className = 'text-xs font-medium text-center text-emerald-600 mb-2';
                 loadTeamData(currentCoordinatorUser.cognome);
             }
@@ -796,7 +853,7 @@
             document.getElementById('modal-view-scheda').classList.toggle('hidden', !show);
         }
 
-        // --- LOGIN COORDINATOR ---
+        // --- AREA COORDINATOR ---
         async function loginCoordinator() {
             const email = document.getElementById('coord-email').value.trim().toLowerCase();
             const pass = document.getElementById('coord-password').value.trim();
@@ -826,7 +883,16 @@
             document.getElementById('coordinator-login-box').classList.add('hidden');
             document.getElementById('coordinator-dashboard').classList.remove('hidden');
             document.getElementById('welcome-coord').textContent = `Team di ${coordUser.nome} ${coordUser.cognome}`;
+            
+            selectedYearCoord = parseInt(document.getElementById('coord-year-select').value, 10);
             loadTeamData(coordUser.cognome);
+        }
+
+        function onCoordYearChange() {
+            selectedYearCoord = parseInt(document.getElementById('coord-year-select').value, 10);
+            if (currentCoordinatorUser) {
+                loadTeamData(currentCoordinatorUser.cognome);
+            }
         }
 
         function logoutCoordinator() {
@@ -854,7 +920,8 @@
             const { data: responses } = await supabaseClient
                 .from('risposte_valutazioni')
                 .select('*')
-                .in('email_dipendente', emails);
+                .in('email_dipendente', emails)
+                .eq('anno', selectedYearCoord);
 
             const respMap = {};
             if (responses) responses.forEach(r => respMap[r.email_dipendente] = r);
@@ -882,7 +949,7 @@
                         </span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', true, true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', true, true, ${selectedYearCoord})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
                             Valuta / Scheda
                         </button>
                     </td>
@@ -913,6 +980,12 @@
             document.getElementById('hr-login-box').classList.add('hidden');
             document.getElementById('hr-dashboard').classList.remove('hidden');
 
+            selectedYearHR = parseInt(document.getElementById('hr-year-select').value, 10);
+            loadHRData();
+        }
+
+        function onHRYearChange() {
+            selectedYearHR = parseInt(document.getElementById('hr-year-select').value, 10);
             loadHRData();
         }
 
@@ -927,7 +1000,10 @@
 
         async function loadHRData() {
             const { data: dipendenti } = await supabaseClient.from('dipendenti').select('*').order('cognome');
-            const { data: responses } = await supabaseClient.from('risposte_valutazioni').select('*');
+            const { data: responses } = await supabaseClient
+                .from('risposte_valutazioni')
+                .select('*')
+                .eq('anno', selectedYearHR);
 
             allDipendentiCache = dipendenti || [];
             allResponsesCache = {};
@@ -960,10 +1036,10 @@
                         </span>
                     </td>
                     <td class="p-3 text-center flex justify-center gap-2">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, false, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                             👁️ Visualizza
                         </button>
-                        <button onclick="downloadSingleSchedaExcel('${m.email}', false)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="downloadSingleSchedaExcel('${m.email}', false, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                             📥 Scarica Excel
                         </button>
                     </td>
@@ -972,12 +1048,10 @@
             });
         }
 
-        // --- SUBTAB 2 HR: RAGGRUPPAMENTO PER REFERENTE / TEAM ---
         function renderHRReferentiTeams() {
             const container = document.getElementById('hr-teams-container');
             container.innerHTML = '';
 
-            // Raggruppa le risorse in base al campo Referente
             const teamsMap = {};
             allDipendentiCache.forEach(m => {
                 const refName = m.referente ? m.referente.trim() : 'Senza Referente';
@@ -985,7 +1059,6 @@
                 teamsMap[refName].push(m);
             });
 
-            // Genera una card/tabella per ogni Referente
             Object.keys(teamsMap).sort().forEach(refName => {
                 const members = teamsMap[refName];
 
@@ -1013,10 +1086,10 @@
                                 </span>
                             </td>
                             <td class="p-3 text-center flex justify-center gap-2">
-                                <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, true, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                                     👁️ Comparativa
                                 </button>
-                                <button onclick="downloadSingleSchedaExcel('${m.email}', true)" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                <button onclick="downloadSingleSchedaExcel('${m.email}', true, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                                     📥 Scarica Excel
                                 </button>
                             </td>
@@ -1186,6 +1259,7 @@
                 const answers = resp.risposte_json || {};
 
                 return {
+                    'Anno': selectedYearHR,
                     'Cognome': m.cognome,
                     'Nome': m.nome,
                     'Email Aziendale': m.email,
@@ -1200,8 +1274,8 @@
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Autovalutazioni');
-            XLSX.writeFile(workbook, 'Report_HR_Autovalutazioni.xlsx');
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Autovalutazioni_${selectedYearHR}`);
+            XLSX.writeFile(workbook, `Report_HR_Autovalutazioni_${selectedYearHR}.xlsx`);
         }
 
         function exportReferentiExcel() {
@@ -1211,6 +1285,7 @@
                 const coordAnswers = resp.risposte_coordinator_json || {};
 
                 return {
+                    'Anno': selectedYearHR,
                     'Risorsa': `${m.cognome} ${m.nome}`,
                     'Email Risorsa': m.email,
                     'Referente': m.referente || '',
@@ -1224,8 +1299,8 @@
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Valutazioni Referenti');
-            XLSX.writeFile(workbook, 'Report_HR_Valutazioni_Referenti.xlsx');
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Referenti_${selectedYearHR}`);
+            XLSX.writeFile(workbook, `Report_HR_Valutazioni_Referenti_${selectedYearHR}.xlsx`);
         }
     </script>
 </body>
