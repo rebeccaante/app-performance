@@ -86,7 +86,7 @@
                         </div>
                         <div class="bg-white p-2.5 rounded border border-slate-200">
                             <span class="font-bold text-slate-900 block border-b pb-1 mb-1">4 Più che adeguato</span>
-                            <span class="text-slate-600">Consolidata padronanza mantenuta constante anche in situazioni di particolare complessità.</span>
+                            <span class="text-slate-600">Consolidata padronanza mantenuta costante anche in situazioni di particolare complessità.</span>
                         </div>
                         <div class="bg-white p-2.5 rounded border border-slate-200">
                             <span class="font-bold text-slate-900 block border-b pb-1 mb-1">5 Eccellente</span>
@@ -144,7 +144,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
-                                <th class="p-3">Dipendente</th>
+                                <th class="p-3">Risorsa</th>
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Team / BU</th>
                                 <th class="p-3 text-center">Stato Autovalutazione</th>
@@ -188,7 +188,7 @@
                 <!-- Sub-Tabs HR -->
                 <div class="flex flex-wrap gap-4 border-b border-slate-200 mb-6">
                     <button id="subtab-autoval" onclick="switchHRSubtab('autoval')" class="pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">
-                        1. Autovalutazioni Dipendenti
+                        1. Autovalutazioni
                     </button>
                     <button id="subtab-referenti" onclick="switchHRSubtab('referenti')" class="pb-2 font-semibold text-slate-500 border-b-2 border-transparent hover:text-slate-700">
                         2. Feedback Referenti
@@ -201,7 +201,7 @@
                 <!-- HR Sub-Section 1: Autovalutazioni -->
                 <div id="hr-sub-autoval">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                        <input type="text" id="hr-search-dip" onkeyup="filterHRDipendenti()" placeholder="Cerca dipendente..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
+                        <input type="text" id="hr-search-dip" onkeyup="filterHRDipendenti()" placeholder="Cerca risorsa..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
                         <button onclick="exportAutovalutazioniExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
                             📊 Scarica Excel Autovalutazioni e Risposte
                         </button>
@@ -210,7 +210,7 @@
                         <table class="w-full text-left border-collapse">
                             <thead class="sticky top-0 bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
                                 <tr>
-                                    <th class="p-3">Dipendente</th>
+                                    <th class="p-3">Risorsa</th>
                                     <th class="p-3">Email</th>
                                     <th class="p-3">Referente</th>
                                     <th class="p-3 text-center">Stato Autovalutazione</th>
@@ -249,7 +249,7 @@
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <input type="text" id="hr-search-anagrafica" onkeyup="filterAnagrafica()" placeholder="Cerca in anagrafica..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
                         <button onclick="toggleAddEmployeeModal(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
-                            ➕ Aggiungi Nuovo Dipendente
+                            ➕ Aggiungi Nuova Risorsa
                         </button>
                     </div>
 
@@ -279,7 +279,7 @@
     <!-- MODALE AGGIUNGI / MODIFICA DIPENDENTE -->
     <div id="modal-employee" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
         <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
-            <h3 id="modal-employee-title" class="text-lg font-bold text-slate-800">Aggiungi Dipendente</h3>
+            <h3 id="modal-employee-title" class="text-lg font-bold text-slate-800">Aggiungi Risorsa</h3>
             <input type="hidden" id="edit-emp-id">
             
             <div class="grid grid-cols-2 gap-3 text-sm">
@@ -319,7 +319,7 @@
 
             <div class="flex justify-end gap-3 pt-2">
                 <button onclick="toggleAddEmployeeModal(false)" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Annulla</button>
-                <button onclick="saveEmployee()" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium">Salva Dipendente</button>
+                <button onclick="saveEmployee()" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium">Salva Risorsa</button>
             </div>
         </div>
     </div>
@@ -474,7 +474,7 @@
                     { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a cooperare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
                     { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
-                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza les risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
                     { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
                     { id: 'q12', cat: 'COMPETENZE DI RUOLO', title: 'LEADERSHIP', desc: 'ha un ruolo definito e riconosciuto di Leader, è esempio positivo per i collaboratori a lui/lei assegnati', type: 'scale' },
                     { id: 'q13', cat: 'COMPETENZE DI RUOLO', title: 'GESTIONE DEL TEAM', desc: 'gestisce e motiva il proprio team, conosce i punti di forza e le lacune e concorre direttamente al raggiungimento degli obiettivi assegnati', type: 'scale' },
@@ -482,7 +482,7 @@
                     { id: 'q15', cat: 'COMPETENZE DI RUOLO', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
                     { id: 'q16', cat: 'COMPETENZE DI RUOLO', title: 'DISCIPLINA', desc: 'E’ autorevole senza essere autoritario; incoraggia il rispetto delle regole e delle procedure aziendali. Ascolta le persone ma disincentiva le eccezioni', type: 'scale' },
                     { id: 'q17', cat: 'COMPETENZE DI RUOLO', title: 'CONSAPEVOLEZZA DEL RUOLO', desc: 'E’ in grado di delegare determinate attività, supervisionando non tanto i compiti a livello quotidiano, quanto il rispetto dei valori dell’azienda e il raggiungimento degli obiettivi. Trasmette, comunicandole con il proprio esempio, la strategia e la cultura', type: 'scale' },
-                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, le strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
+                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, las strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
                     { id: 'q19', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
                 ];
             } else {
@@ -496,10 +496,10 @@
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure, rispetta la pianificazione, arriva puntuale agli impegni e alle riunioni, dimostra fedeltà all\'organizzazione, rispetta gli obblighi legali e le normative di sicurezza richieste dal ruolo', type: 'scale' },
                     { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nelle attività, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a operare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
-                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel satisfying le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
                     { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
-                    { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
+                    { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assigned e delle scadenze aziendali', type: 'scale' },
                     { id: 'q13', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
                     { id: 'q14', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
                 ];
@@ -512,6 +512,18 @@
 
                 if (q.type === 'scale') {
                     const defaultScore = savedVal !== null && savedVal !== undefined ? parseInt(savedVal, 10) : 4;
+                    
+                    const valuesList = [1, 2, 3, 4, 5];
+                    let radiosHTML = '';
+                    valuesList.forEach(v => {
+                        radiosHTML += `
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="${q.id}" value="${v}" ${v === defaultScore ? 'checked' : ''} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
+                                <span class="text-xs font-bold text-slate-700">${v}</span>
+                            </label>
+                        `;
+                    });
+
                     div.innerHTML = `
                         <div class="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-1">${q.cat}</div>
                         <h4 class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</h4>
@@ -519,12 +531,7 @@
                         <div class="flex items-center gap-2 md:gap-6 bg-slate-50 p-3 rounded border border-slate-200 justify-between">
                             <span class="text-xs text-slate-500 font-medium hidden md:inline">1 (Minimo)</span>
                             <div class="flex gap-4 md:gap-8 mx-auto md:mx-0">
-                                ${[1, 2, 3, 4, 5].map(v => `
-                                    <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                        <input type="radio" name="\${q.id}" value="${v}" ${v === defaultScore ? 'checked' : ''} class="w-4 h-4 text-indigo-600 focus:ring-indigo-500">
-                                        <span class="text-xs font-bold text-slate-700">\${v}</span>
-                                    </label>
-                                `).join('')}
+                                ${radiosHTML}
                             </div>
                             <span class="text-xs text-slate-500 font-medium hidden md:inline">5 (Eccellente)</span>
                         </div>
@@ -635,7 +642,7 @@
                 .ilike('referente', `%${coordCognome}%`);
 
             if (!teamMembers || teamMembers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nessun dipendente associato a te come referente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nessuna risorsa associata a te come referente.</td></tr>`;
                 return;
             }
 
@@ -819,7 +826,7 @@
         function toggleAddEmployeeModal(show) {
             document.getElementById('modal-employee').classList.toggle('hidden', !show);
             if (show && !document.getElementById('edit-emp-id').value) {
-                document.getElementById('modal-employee-title').textContent = 'Aggiungi Dipendente';
+                document.getElementById('modal-employee-title').textContent = 'Aggiungi Risorsa';
                 document.getElementById('edit-emp-id').value = '';
                 document.getElementById('emp-azienda').value = 'HQ ENGINEERING SRL';
                 document.getElementById('emp-cognome').value = '';
@@ -836,7 +843,7 @@
             const emp = allDipendentiCache.find(e => e.id === id);
             if (!emp) return;
 
-            document.getElementById('modal-employee-title').textContent = 'Modifica Dipendente';
+            document.getElementById('modal-employee-title').textContent = 'Modifica Risorsa';
             document.getElementById('edit-emp-id').value = emp.id;
             document.getElementById('emp-azienda').value = emp.azienda || '';
             document.getElementById('emp-cognome').value = emp.cognome || '';
