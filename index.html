@@ -214,6 +214,7 @@
                                     <th class="p-3">Email</th>
                                     <th class="p-3">Referente</th>
                                     <th class="p-3 text-center">Stato Autovalutazione</th>
+                                    <th class="p-3 text-center">Azione</th>
                                 </tr>
                             </thead>
                             <tbody id="hr-table-autoval" class="divide-y divide-slate-200 text-sm"></tbody>
@@ -320,6 +321,27 @@
             <div class="flex justify-end gap-3 pt-2">
                 <button onclick="toggleAddEmployeeModal(false)" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded">Annulla</button>
                 <button onclick="saveEmployee()" class="px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium">Salva Risorsa</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE VISUALIZZA SCHEDA COMPILATA -->
+    <div id="modal-view-scheda" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col p-6">
+            <div class="flex justify-between items-center pb-4 border-b">
+                <div>
+                    <h3 id="modal-scheda-title" class="text-lg font-bold text-slate-800">Scheda Autovalutazione</h3>
+                    <p id="modal-scheda-subtitle" class="text-xs text-slate-500"></p>
+                </div>
+                <button onclick="toggleViewSchedaModal(false)" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+            </div>
+            
+            <div id="modal-scheda-content" class="overflow-y-auto my-4 space-y-4 pr-2 text-sm">
+                <!-- Contenuto dinamico delle risposte -->
+            </div>
+
+            <div class="flex justify-end pt-3 border-t">
+                <button onclick="toggleViewSchedaModal(false)" class="px-5 py-2 text-sm bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium">Chiudi</button>
             </div>
         </div>
     </div>
@@ -444,13 +466,9 @@
             currentUser = null;
         }
 
-        // --- DEFINIZIONE DOMANDE E STRUTTURA DELLE 3 SCHEDE ---
-        function renderDynamicQuestions(category, savedAnswers) {
-            const container = document.getElementById('dynamic-questions');
-            container.innerHTML = '';
-
+        function getQuestionsForCategory(category) {
             if (category === 'CONSULENZA') {
-                currentQuestions = [
+                return [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze lavorative attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi di lavoro.', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
@@ -464,7 +482,7 @@
                     { id: 'q11', cat: 'NOTE E RIFLESSIONI', title: 'ANNOTAZIONI SULL\'ATTIVITÀ IN CONSULENZA', desc: 'processi da migliorare, suggerimenti, riflessioni sull\'attività svolta...', type: 'text' }
                 ];
             } else if (category === 'COORDINATOR') {
-                currentQuestions = [
+                return [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma gruppi compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
@@ -473,8 +491,8 @@
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Segue le direttive, rispetta la pianificazione e le scadenze assegnate', type: 'scale' },
                     { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a cooperare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
-                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
-                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza les risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, conceptuale e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
                     { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
                     { id: 'q12', cat: 'COMPETENZE DI RUOLO', title: 'LEADERSHIP', desc: 'ha un ruolo definito e riconosciuto di Leader, è esempio positivo per i collaboratori a lui/lei assegnati', type: 'scale' },
                     { id: 'q13', cat: 'COMPETENZE DI RUOLO', title: 'GESTIONE DEL TEAM', desc: 'gestisce e motiva il proprio team, conosce i punti di forza e le lacune e concorre direttamente al raggiungimento degli obiettivi assegnati', type: 'scale' },
@@ -482,12 +500,11 @@
                     { id: 'q15', cat: 'COMPETENZE DI RUOLO', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
                     { id: 'q16', cat: 'COMPETENZE DI RUOLO', title: 'DISCIPLINA', desc: 'E’ autorevole senza essere autoritario; incoraggia il rispetto delle regole e delle procedure aziendali. Ascolta le persone ma disincentiva le eccezioni', type: 'scale' },
                     { id: 'q17', cat: 'COMPETENZE DI RUOLO', title: 'CONSAPEVOLEZZA DEL RUOLO', desc: 'E’ in grado di delegare determinate attività, supervisionando non tanto i compiti a livello quotidiano, quanto il rispetto dei valori dell’azienda e il raggiungimento degli obiettivi. Trasmette, comunicandole con il proprio esempio, la strategia e la cultura', type: 'scale' },
-                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, las strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
+                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, le strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
                     { id: 'q19', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
                 ];
             } else {
-                // GENERALE
-                currentQuestions = [
+                return [
                     { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma Team compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
                     { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
                     { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
@@ -496,14 +513,21 @@
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure, rispetta la pianificazione, arriva puntuale agli impegni e alle riunioni, dimostra fedeltà all\'organizzazione, rispetta gli obblighi legali e le normative di sicurezza richieste dal ruolo', type: 'scale' },
                     { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nelle attività, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
                     { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a operare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
-                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel satisfying le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
                     { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
-                    { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assigned e delle scadenze aziendali', type: 'scale' },
+                    { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
                     { id: 'q13', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
                     { id: 'q14', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
                 ];
             }
+        }
+
+        // --- DEFINIZIONE DOMANDE E STRUTTURA DELLE 3 SCHEDE ---
+        function renderDynamicQuestions(category, savedAnswers) {
+            const container = document.getElementById('dynamic-questions');
+            container.innerHTML = '';
+            currentQuestions = getQuestionsForCategory(category);
 
             currentQuestions.forEach((q, idx) => {
                 const div = document.createElement('div');
@@ -595,6 +619,70 @@
             msg.classList.remove('hidden');
         }
 
+        // --- APRI MODALE DETTAGLIO SCHEDA COMPILATA ---
+        async function viewMemberScheda(email, nome, cognome, bu, team) {
+            const { data: user } = await supabaseClient.from('dipendenti').select('*').eq('email', email).maybeSingle();
+            const { data: resp } = await supabaseClient.from('risposte_valutazioni').select('*').eq('email_dipendente', email).maybeSingle();
+
+            const titleEl = document.getElementById('modal-scheda-title');
+            const subtitleEl = document.getElementById('modal-scheda-subtitle');
+            const contentEl = document.getElementById('modal-scheda-content');
+
+            titleEl.textContent = `Scheda di Autovalutazione - ${nome} ${cognome}`;
+            subtitleEl.textContent = `Email: ${email} | BU: ${bu || '-'} | Team: ${team || '-'}`;
+
+            if (!resp || !resp.risposte_json) {
+                contentEl.innerHTML = `<div class="p-6 text-center text-slate-500 font-medium">La risorsa non ha ancora inviato la scheda di autovalutazione.</div>`;
+                toggleViewSchedaModal(true);
+                return;
+            }
+
+            const answers = resp.risposte_json;
+            const buUpper = (bu || '').toUpperCase();
+            const teamUpper = (team || '').toUpperCase();
+            const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
+            
+            // Determina la categoria di domande per mostrare il testo corretto
+            let cat = 'GENERALE';
+            if (isConsulenza) cat = 'CONSULENZA';
+
+            const questions = getQuestionsForCategory(cat);
+
+            let html = '';
+            questions.forEach((q, idx) => {
+                const val = answers[q.id];
+                if (q.type === 'scale') {
+                    html += `
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="text-xs font-bold text-indigo-600 uppercase mb-1">${q.cat}</div>
+                            <div class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</div>
+                            <div class="text-xs text-slate-600 mb-2">${q.desc}</div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-semibold text-slate-700">Punteggio assegnato:</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">${val !== undefined ? val : 'N/D'} / 5</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <div class="text-xs font-bold text-indigo-600 uppercase mb-1">${q.cat}</div>
+                            <div class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</div>
+                            <div class="text-xs text-slate-600 mb-2">${q.desc}</div>
+                            <div class="p-3 bg-white border border-slate-200 rounded text-slate-800 text-xs whitespace-pre-wrap">${val || 'Nessuna risposta fornita.'}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            contentEl.innerHTML = html;
+            toggleViewSchedaModal(true);
+        }
+
+        function toggleViewSchedaModal(show) {
+            document.getElementById('modal-view-scheda').classList.toggle('hidden', !show);
+        }
+
         // --- LOGIN COORDINATOR ---
         async function loginCoordinator() {
             const email = document.getElementById('coord-email').value.trim().toLowerCase();
@@ -672,7 +760,7 @@
                         </span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="alert('Scheda completata da ${m.nome} ${m.cognome}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
                             Visualizza Scheda
                         </button>
                     </td>
@@ -748,6 +836,11 @@
                         <span class="px-2 py-1 text-xs rounded-full font-semibold ${completato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
                             ${completato ? 'Completato' : 'In attesa'}
                         </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                            Visualizza Scheda
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
