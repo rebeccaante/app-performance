@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>App Performance - Area Personale, Coordinator & HR</title>
-    <!-- Tailwind CSS per la grafica -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Client Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,7 +29,6 @@
 
         <!-- SECTION 1: AREA PERSONALE -->
         <div id="section-personale" class="bg-white p-8 rounded-xl shadow-md border border-slate-200">
-            <!-- Form Inserimento Email -->
             <div id="personale-login-box">
                 <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Personale - Autovalutazione Performance</h1>
                 <p class="text-slate-600 mb-6">Inserisci la tua email aziendale per accedere alla tua scheda di autovalutazione dedicata.</p>
@@ -46,7 +45,6 @@
                 <div id="msg-routing" class="mt-4 text-sm font-medium hidden"></div>
             </div>
 
-            <!-- Scheda Valutazione Interna (Generata Dinamicamente) -->
             <div id="evaluation-form-box" class="hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
                     <div>
@@ -58,7 +56,6 @@
                     <button onclick="resetEvaluationForm()" class="text-sm text-slate-500 hover:text-slate-800 font-medium">Cambia Email</button>
                 </div>
 
-                <!-- Box Dati Anagrafici Precompilati -->
                 <div class="bg-indigo-50/60 p-4 rounded-lg border border-indigo-100 mb-6 text-sm grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div><span class="font-semibold text-slate-600">Email:</span> <span id="info-email" class="font-medium text-slate-900"></span></div>
                     <div><span class="font-semibold text-slate-600">Business Unit:</span> <span id="info-bu" class="font-medium text-slate-900"></span></div>
@@ -67,7 +64,6 @@
                     <div id="box-team-gestito" class="hidden col-span-2"><span class="font-semibold text-indigo-700">Team Gestito (Coordinator):</span> <span id="info-team-gestito" class="font-medium text-indigo-900"></span></div>
                 </div>
 
-                <!-- Box Definizione Scala di Punteggio (1-5) -->
                 <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 mb-8">
                     <h3 class="font-bold text-slate-800 mb-2 text-base">Gruppo AUTOVALUTAZIONE PERFORMANCE</h3>
                     <p class="text-xs text-slate-600 mb-3">Rispondi alle seguenti domande utilizzando questa <strong>scala di punteggio</strong>:</p>
@@ -96,9 +92,7 @@
                 </div>
 
                 <form onsubmit="submitEvaluation(event)" class="space-y-8">
-                    <!-- Domande dinamiche generate via JS -->
                     <div id="dynamic-questions" class="space-y-6"></div>
-
                     <div class="flex justify-end gap-4 pt-4 border-t">
                         <button type="submit" id="btn-submit-eval" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-colors text-base">
                             Invia Autovalutazione
@@ -112,9 +106,8 @@
         <!-- SECTION 2: AREA COORDINATOR -->
         <div id="section-coordinator" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 hidden">
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Coordinator</h1>
-            <p class="text-slate-600 mb-6">Accedi per visionare e confermare le schede del tuo team.</p>
+            <p class="text-slate-600 mb-6">Accedi per visionare, valutare e confermare le schede del tuo team.</p>
 
-            <!-- Login Coordinator -->
             <div id="coordinator-login-box" class="max-w-md space-y-4">
                 <div>
                     <label for="coord-email" class="block text-sm font-medium text-slate-700 mb-1">Email Coordinator</label>
@@ -130,12 +123,11 @@
                 <div id="coord-login-msg" class="text-sm font-medium text-red-600 hidden"></div>
             </div>
 
-            <!-- Dashboard Team -->
             <div id="coordinator-dashboard" class="hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
                     <div>
                         <h2 id="welcome-coord" class="text-xl font-bold text-slate-800">Team di ...</h2>
-                        <p class="text-sm text-slate-500">Gestione e conferma valori per i componenti del team</p>
+                        <p class="text-sm text-slate-500">Gestione e inserimento valutazioni per i componenti del team</p>
                     </div>
                     <button onclick="logoutCoordinator()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
                 </div>
@@ -148,6 +140,7 @@
                                 <th class="p-3">Email</th>
                                 <th class="p-3">Team / BU</th>
                                 <th class="p-3 text-center">Stato Autovalutazione</th>
+                                <th class="p-3 text-center">Stato Valutazione Referente</th>
                                 <th class="p-3 text-center">Azione</th>
                             </tr>
                         </thead>
@@ -162,7 +155,6 @@
             <h1 class="text-2xl font-bold text-slate-900 mb-2">Area Risorse Umane (HR)</h1>
             <p class="text-slate-600 mb-6">Pannello di controllo riservato al team HR per la verifica globale dell'avanzamento e gestione anagrafica.</p>
 
-            <!-- Login HR -->
             <div id="hr-login-box" class="max-w-md space-y-4">
                 <div>
                     <label for="hr-email" class="block text-sm font-medium text-slate-700 mb-1">Email HR Autorizzata</label>
@@ -178,14 +170,12 @@
                 <div id="hr-login-msg" class="text-sm font-medium text-red-600 hidden"></div>
             </div>
 
-            <!-- Dashboard HR -->
             <div id="hr-dashboard" class="hidden">
                 <div class="flex justify-between items-center mb-6 pb-4 border-b">
                     <h2 class="text-xl font-bold text-slate-800">Dashboard Risorse Umane</h2>
                     <button onclick="logoutHR()" class="text-sm text-red-600 hover:underline font-medium">Scollegati</button>
                 </div>
 
-                <!-- Sub-Tabs HR -->
                 <div class="flex flex-wrap gap-4 border-b border-slate-200 mb-6">
                     <button id="subtab-autoval" onclick="switchHRSubtab('autoval')" class="pb-2 font-semibold text-indigo-600 border-b-2 border-indigo-600">
                         1. Autovalutazioni
@@ -198,12 +188,11 @@
                     </button>
                 </div>
 
-                <!-- HR Sub-Section 1: Autovalutazioni -->
                 <div id="hr-sub-autoval">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <input type="text" id="hr-search-dip" onkeyup="filterHRDipendenti()" placeholder="Cerca risorsa..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
                         <button onclick="exportAutovalutazioniExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
-                            📊 Scarica Excel Autovalutazioni e Risposte
+                            📊 Scarica Excel Autovalutazioni
                         </button>
                     </div>
                     <div class="overflow-x-auto max-h-[500px]">
@@ -222,30 +211,30 @@
                     </div>
                 </div>
 
-                <!-- HR Sub-Section 2: Feedback Referenti -->
                 <div id="hr-sub-referenti" class="hidden">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-bold text-slate-700">Stato Feedback per Referente</h3>
+                        <h3 class="font-bold text-slate-700">Stato Valutazioni Referenti & Dettaglio Comparativo</h3>
                         <button onclick="exportReferentiExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-sm px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm transition-colors">
-                            📊 Scarica Excel Avanzamento Referenti
+                            📊 Scarica Excel Referenti
                         </button>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead class="bg-slate-100 border-b text-xs uppercase text-slate-600 font-semibold">
                                 <tr>
+                                    <th class="p-3">Risorsa</th>
+                                    <th class="p-3">Email</th>
                                     <th class="p-3">Referente</th>
-                                    <th class="p-3 text-center">Membri Team</th>
-                                    <th class="p-3 text-center">Autovalutazioni Inviate</th>
-                                    <th class="p-3 text-center">Stato Completamento</th>
+                                    <th class="p-3 text-center">Stato Autovalutazione</th>
+                                    <th class="p-3 text-center">Stato Valutazione Referente</th>
+                                    <th class="p-3 text-center">Azione HR</th>
                                 </tr>
                             </thead>
-                            <tbody id="hr-table-referenti" class="divide-y divide-slate-200 text-sm"></tbody>
+                            <tbody id="hr-table-referenti-dettaglio" class="divide-y divide-slate-200 text-sm"></tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- HR Sub-Section 3: Gestione Anagrafica -->
                 <div id="hr-sub-anagrafica" class="hidden">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
                         <input type="text" id="hr-search-anagrafica" onkeyup="filterAnagrafica()" placeholder="Cerca in anagrafica..." class="px-3 py-1.5 text-sm border border-slate-300 rounded-lg w-full md:w-64">
@@ -325,9 +314,9 @@
         </div>
     </div>
 
-    <!-- MODALE VISUALIZZA SCHEDA COMPILATA -->
+    <!-- MODALE VISUALIZZA / VALUTA SCHEDA COMPILATA -->
     <div id="modal-view-scheda" class="fixed inset-0 bg-slate-900 bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-        <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col p-6">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col p-6">
             <div class="flex justify-between items-center pb-4 border-b">
                 <div>
                     <h3 id="modal-scheda-title" class="text-lg font-bold text-slate-800">Scheda Autovalutazione</h3>
@@ -336,23 +325,22 @@
                 <button onclick="toggleViewSchedaModal(false)" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
             </div>
             
-            <div id="modal-scheda-content" class="overflow-y-auto my-4 space-y-4 pr-2 text-sm">
-                <!-- Contenuto dinamico delle risposte -->
-            </div>
+            <div id="modal-scheda-content" class="overflow-y-auto my-4 space-y-4 pr-2 text-sm"></div>
 
-            <div class="flex justify-end pt-3 border-t">
-                <button onclick="toggleViewSchedaModal(false)" class="px-5 py-2 text-sm bg-slate-800 hover:bg-slate-900 text-white rounded-lg font-medium">Chiudi</button>
+            <div id="modal-coordinator-msg" class="text-xs font-medium text-center hidden mb-2"></div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t">
+                <button onclick="toggleViewSchedaModal(false)" class="px-5 py-2 text-sm bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg font-medium">Chiudi</button>
+                <button id="btn-save-coordinator-eval" onclick="saveCoordinatorEvaluation()" class="px-5 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium hidden">Invia Valutazione Coordinator</button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURAZIONE SUPABASE ---
         const SUPABASE_URL = 'https://icwvqpdhloeegwcgmgpa.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_3JQdZmfHynkXkDT8t-0sxQ_1vZ13u9r';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- AUTORIZZAZIONI HR ---
         const HR_ALLOWED_EMAILS = [
             'rebecca.antenozio@hqe.it',
             'chiara.pizzorno@hqe.it',
@@ -361,9 +349,10 @@
         ];
 
         let currentUser = null;
-        let currentQuestions = [];
+        let currentCoordinatorUser = null;
+        let activeTargetEmail = null;
+        let activeTargetQuestions = [];
 
-        // --- TABS SWITCHING ---
         function switchTab(tab) {
             ['personale', 'coordinator', 'hr'].forEach(t => {
                 document.getElementById(`section-${t}`).classList.add('hidden');
@@ -388,7 +377,6 @@
             });
         }
 
-        // --- AREA PERSONALE: CHECK ED ELABORAZIONE DOMANDE ---
         async function checkAndLoadEvaluationForm(e) {
             e.preventDefault();
             const email = document.getElementById('user-email').value.trim().toLowerCase();
@@ -410,7 +398,6 @@
 
             currentUser = user;
 
-            // 1. Controllo COORDINATOR
             const userCognome = user.cognome.trim();
             const { data: teamManaged } = await supabaseClient
                 .from('dipendenti')
@@ -418,8 +405,6 @@
                 .ilike('referente', `%${userCognome}%`);
 
             const isCoordinator = teamManaged && teamManaged.length > 0;
-
-            // 2. Controllo CONSULENZA
             const buUpper = (user.bu || '').toUpperCase();
             const teamUpper = (user.team || '').toUpperCase();
             const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
@@ -428,7 +413,6 @@
             if (isCoordinator) moduleCategory = 'COORDINATOR';
             else if (isConsulenza) moduleCategory = 'CONSULENZA';
 
-            // Popola Dati Anagrafica nel Form
             document.getElementById('personale-login-box').classList.add('hidden');
             document.getElementById('evaluation-form-box').classList.remove('hidden');
 
@@ -449,7 +433,6 @@
                 boxTeamGestito.classList.add('hidden');
             }
 
-            // Carica eventuali risposte preesistenti
             const { data: existingResp } = await supabaseClient
                 .from('risposte_valutazioni')
                 .select('*')
@@ -469,53 +452,53 @@
         function getQuestionsForCategory(category) {
             if (category === 'CONSULENZA') {
                 return [
-                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
-                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze lavorative attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi di lavoro.', type: 'scale' },
-                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
-                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e lavora in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
-                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'lavora in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nel lavoro, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
-                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, lavora in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
-                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione...', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche...', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'lavora in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative...', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo...', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto...', type: 'scale' },
                     { id: 'q9', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
                     { id: 'q10', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
                     { id: 'q11', cat: 'NOTE E RIFLESSIONI', title: 'ANNOTAZIONI SULL\'ATTIVITÀ IN CONSULENZA', desc: 'processi da migliorare, suggerimenti, riflessioni sull\'attività svolta...', type: 'text' }
                 ];
             } else if (category === 'COORDINATOR') {
                 return [
-                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma gruppi compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
-                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
-                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
-                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
-                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità...', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione...', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche...', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
                     { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Segue le direttive, rispetta la pianificazione e le scadenze assegnate', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
-                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a cooperare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
-                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, conceptuale e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
-                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
-                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
-                    { id: 'q12', cat: 'COMPETENZE DI RUOLO', title: 'LEADERSHIP', desc: 'ha un ruolo definito e riconosciuto di Leader, è esempio positivo per i collaboratori a lui/lei assegnati', type: 'scale' },
-                    { id: 'q13', cat: 'COMPETENZE DI RUOLO', title: 'GESTIONE DEL TEAM', desc: 'gestisce e motiva il proprio team, conosce i punti di forza e le lacune e concorre direttamente al raggiungimento degli obiettivi assegnati', type: 'scale' },
-                    { id: 'q14', cat: 'COMPETENZE DI RUOLO', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
-                    { id: 'q15', cat: 'COMPETENZE DI RUOLO', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
-                    { id: 'q16', cat: 'COMPETENZE DI RUOLO', title: 'DISCIPLINA', desc: 'E’ autorevole senza essere autoritario; incoraggia il rispetto delle regole e delle procedure aziendali. Ascolta le persone ma disincentiva le eccezioni', type: 'scale' },
-                    { id: 'q17', cat: 'COMPETENZE DI RUOLO', title: 'CONSAPEVOLEZZA DEL RUOLO', desc: 'E’ in grado di delegare determinate attività, supervisionando non tanto i compiti a livello quotidiano, quanto il rispetto dei valori dell’azienda e il raggiungimento degli obiettivi. Trasmette, comunicandole con il proprio esempio, la strategia e la cultura', type: 'scale' },
-                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, le strategie, le direzioni da prendere, anche nei momenti difficili. Comprende la situazione, fa gli interessi dell’intera organizzazione piuttosto che del singolo (o di se stesso). E’ fermo, anche se consapevole che non tutti saranno felici', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri...', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente...', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività...', type: 'scale' },
+                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto...', type: 'scale' },
+                    { id: 'q12', cat: 'COMPETENZE DI RUOLO', title: 'LEADERSHIP', desc: 'ha un ruolo definito e riconosciuto di Leader...', type: 'scale' },
+                    { id: 'q13', cat: 'COMPETENZE DI RUOLO', title: 'GESTIONE DEL TEAM', desc: 'gestisce e motiva il proprio team...', type: 'scale' },
+                    { id: 'q14', cat: 'COMPETENZE DI RUOLO', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
+                    { id: 'q15', cat: 'COMPETENZE DI RUOLO', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
+                    { id: 'q16', cat: 'COMPETENZE DI RUOLO', title: 'DISCIPLINA', desc: 'E’ autorevole senza essere autoritario...', type: 'scale' },
+                    { id: 'q17', cat: 'COMPETENZE DI RUOLO', title: 'CONSAPEVOLEZZA DEL RUOLO', desc: 'E’ in grado di delegare determinate attività...', type: 'scale' },
+                    { id: 'q18', cat: 'COMPETENZE DI RUOLO', title: 'PRENDE DECISIONI DIFFICILI', desc: 'Sceglie le persone, gli strumenti, le strategie...', type: 'scale' },
                     { id: 'q19', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
                 ];
             } else {
                 return [
-                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità, promuove e difende le pari opportunità, forma Team compositi, incoraggia il senso di responsabilità individuale e dell\'organizzazione nei confronti del contesto sociale e dell\'ambiente', type: 'scale' },
-                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione, suddivide le informazioni nelle loro componenti principali, nelle diverse tipologie e nelle loro interazioni, ricerca ulteriori informazioni per una più ampia comprensione del problema, costruisce delle ipotesi razionali in base all\'analisi delle informazioni disponibili, produce soluzioni', type: 'scale' },
-                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche, accresce le proprie conoscenze e competenze attraverso un continuo sviluppo professionale, condivide la propria esperienza e le conoscenze con gli altri, usa la tecnologia per raggiungere gli obiettivi.', type: 'scale' },
-                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo (imparare dai successi e dai fallimenti e ricercare feedback da clienti e collaboratori), gestisce le conoscenze (raccoglie, cataloga e diffonde le informazioni nell\'organizzazione)', type: 'scale' },
-                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci che possono anche comprendere scelte difficili e rischi calcolati, si assume la responsabilità delle azioni, dei progetti e delle persone, prende l\'iniziativa, agisce con sicurezza e opera in modo autonomo, dà inizio alle attività e le porta avanti', type: 'scale' },
-                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure, rispetta la pianificazione, arriva puntuale agli impegni e alle riunioni, dimostra fedeltà all\'organizzazione, rispetta gli obblighi legali e le normative di sicurezza richieste dal ruolo', type: 'scale' },
-                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante, mantiene le emozioni sotto controllo in situazioni difficili, bilancia le esigenze della vita privata, mantiene una visione positiva nelle attività, gestisce positivamente le critiche ed impara da queste', type: 'scale' },
-                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri, si adatta a operare con gli altri e costruisce lo spirito di gruppo, riconosce e valorizza i contributi degli altri, ascolta, consulta gli altri e comunica apertamente il proprio pensiero, ad esempio la consapevolezza dei propri punti di forza e delle proprie debolezze', type: 'scale' },
-                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative, stabilisce degli elevati standard qualitativi e quantitativi, controlla e mantiene qualità e produttività, opera in modo sistematico, metodico e ordinato, raggiunge sistematicamente gli obbiettivi stabiliti', type: 'scale' },
-                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo e tiene conto di possibili cambiamenti, gestisce il tempo efficacemente, identifica ed organizza le risorse necessarie per completare le attività, monitora la performance sulla base di scadenze e step intermedi', type: 'scale' },
-                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto, scrive in maniera convincente ed espressiva, evita l\'uso inutile di espressioni gergali o di un linguaggio complicato, scrive in modo logico e ben strutturato, struttura le informazioni in modo da soddisfare le attese e favorire la comprensione dell\'audience', type: 'scale' },
+                    { id: 'q1', cat: 'COMPETENZE TRASVERSALI', title: 'ADERIRE A PRINCIPI E VALORI', desc: 'Sostiene l\'etica e i valori, dimostra integrità...', type: 'scale' },
+                    { id: 'q2', cat: 'COMPETENZE TRASVERSALI', title: 'ANALISI', desc: 'analizza i dati numerici, verbali e tutte le altre fonti d\'informazione...', type: 'scale' },
+                    { id: 'q3', cat: 'COMPETENZE TRASVERSALI', title: 'APPLICARE LE CONOSCENZE E LA TECNOLOGIA', desc: 'applica le proprie conoscenze tecniche e specialistiche...', type: 'scale' },
+                    { id: 'q4', cat: 'COMPETENZE TRASVERSALI', title: 'APPRENDIMENTO ORGANIZZATIVO', desc: 'incoraggia un approccio di apprendimento organizzativo...', type: 'scale' },
+                    { id: 'q5', cat: 'COMPETENZE TRASVERSALI', title: 'DECISION MAKING E SPIRITO DI INIZIATIVA', desc: 'prende decisioni chiare e veloci...', type: 'scale' },
+                    { id: 'q6', cat: 'COMPETENZE TRASVERSALI', title: 'DISCIPLINA', desc: 'Non sfida l\'autorità, segue le direttive e le procedure...', type: 'scale' },
+                    { id: 'q7', cat: 'COMPETENZE TRASVERSALI', title: 'FRONTEGGIARE LA PRESSIONE E LE DIFFICOLTÀ', desc: 'opera in maniera produttiva anche in un ambiente stressante...', type: 'scale' },
+                    { id: 'q8', cat: 'COMPETENZE TRASVERSALI', title: 'COLLABORARE CON GLI ALTRI', desc: 'dimostra interesse e comprensione per gli altri...', type: 'scale' },
+                    { id: 'q9', cat: 'COMPETENZE TRASVERSALI', title: 'ORIENTAMENTO AL RISULTATO E AL CLIENTE (INTERNO/ESTERNO)', desc: 'si concentra sui bisogni del cliente e nel soddisfare le sue aspettative...', type: 'scale' },
+                    { id: 'q10', cat: 'COMPETENZE TRASVERSALI', title: 'PIANIFICARE ED ORGANIZZARE', desc: 'stabilisce obbiettivi chiari, pianifica attività e progetti in anticipo...', type: 'scale' },
+                    { id: 'q11', cat: 'COMPETENZE TRASVERSALI', title: 'SCRIVERE E FARE RELAZIONI', desc: 'scrive in modo chiaro, conciso e corretto...', type: 'scale' },
                     { id: 'q12', cat: 'COMPETENZE TECNICHE', title: 'OPERATIVITÀ DI FUNZIONE', desc: 'è autonomo nella gestione dei compiti assegnati e delle scadenze aziendali', type: 'scale' },
                     { id: 'q13', cat: 'COMPETENZE TECNICHE', title: 'SOFTWARE', desc: 'utilizza in modo corretto i programmi necessari per la funzione', type: 'scale' },
                     { id: 'q14', cat: 'ASPETTATIVE E OBIETTIVI PERSONALI', title: 'ASPETTATIVE E OBIETTIVI PERSONALI', desc: 'Descrivi le tue aspettative e i tuoi obbiettivi personali riferiti al tuo ruolo', type: 'text' }
@@ -523,20 +506,18 @@
             }
         }
 
-        // --- DEFINIZIONE DOMANDE E STRUTTURA DELLE 3 SCHEDE ---
         function renderDynamicQuestions(category, savedAnswers) {
             const container = document.getElementById('dynamic-questions');
             container.innerHTML = '';
-            currentQuestions = getQuestionsForCategory(category);
+            const questions = getQuestionsForCategory(category);
 
-            currentQuestions.forEach((q, idx) => {
+            questions.forEach((q, idx) => {
                 const div = document.createElement('div');
                 div.className = 'bg-white p-5 rounded-lg border border-slate-200 shadow-sm';
                 const savedVal = savedAnswers ? savedAnswers[q.id] : null;
 
                 if (q.type === 'scale') {
                     const defaultScore = savedVal !== null && savedVal !== undefined ? parseInt(savedVal, 10) : 4;
-                    
                     const valuesList = [1, 2, 3, 4, 5];
                     let radiosHTML = '';
                     valuesList.forEach(v => {
@@ -573,7 +554,6 @@
             });
         }
 
-        // --- SALVATAGGIO VALUTAZIONE SU SUPABASE ---
         async function submitEvaluation(e) {
             e.preventDefault();
             if (!currentUser) return;
@@ -584,8 +564,15 @@
             btn.textContent = 'Salvataggio in corso...';
             msg.classList.add('hidden');
 
+            const buUpper = (currentUser.bu || '').toUpperCase();
+            const teamUpper = (currentUser.team || '').toUpperCase();
+            const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
+            let cat = 'GENERALE';
+            if (isConsulenza) cat = 'CONSULENZA';
+
+            const questions = getQuestionsForCategory(cat);
             const answersMap = {};
-            currentQuestions.forEach(q => {
+            questions.forEach(q => {
                 if (q.type === 'scale') {
                     const selected = document.querySelector(`input[name="${q.id}"]:checked`);
                     answersMap[q.id] = selected ? parseInt(selected.value, 10) : 4;
@@ -619,64 +606,146 @@
             msg.classList.remove('hidden');
         }
 
-        // --- APRI MODALE DETTAGLIO SCHEDA COMPILATA ---
-        async function viewMemberScheda(email, nome, cognome, bu, team) {
-            const { data: user } = await supabaseClient.from('dipendenti').select('*').eq('email', email).maybeSingle();
+        // --- VISUALIZZA / COMPILA SCHEDA IN MODALE ---
+        async function viewMemberScheda(email, nome, cognome, bu, team, isCoordinatorView = false) {
+            activeTargetEmail = email;
             const { data: resp } = await supabaseClient.from('risposte_valutazioni').select('*').eq('email_dipendente', email).maybeSingle();
 
             const titleEl = document.getElementById('modal-scheda-title');
             const subtitleEl = document.getElementById('modal-scheda-subtitle');
             const contentEl = document.getElementById('modal-scheda-content');
+            const btnSaveCoord = document.getElementById('btn-save-coordinator-eval');
+            const msgCoord = document.getElementById('modal-coordinator-msg');
 
-            titleEl.textContent = `Scheda di Autovalutazione - ${nome} ${cognome}`;
+            msgCoord.classList.add('hidden');
+            titleEl.textContent = `Scheda di Valutazione - ${nome} ${cognome}`;
             subtitleEl.textContent = `Email: ${email} | BU: ${bu || '-'} | Team: ${team || '-'}`;
 
             if (!resp || !resp.risposte_json) {
                 contentEl.innerHTML = `<div class="p-6 text-center text-slate-500 font-medium">La risorsa non ha ancora inviato la scheda di autovalutazione.</div>`;
+                btnSaveCoord.classList.add('hidden');
                 toggleViewSchedaModal(true);
                 return;
             }
 
-            const answers = resp.risposte_json;
+            const answers = resp.risposte_json || {};
+            const coordAnswers = resp.risposte_coordinator_json || {};
+
             const buUpper = (bu || '').toUpperCase();
             const teamUpper = (team || '').toUpperCase();
             const isConsulenza = buUpper.includes('CONSULENZA') || teamUpper.includes('CONSULENZA');
-            
-            // Determina la categoria di domande per mostrare il testo corretto
             let cat = 'GENERALE';
             if (isConsulenza) cat = 'CONSULENZA';
 
-            const questions = getQuestionsForCategory(cat);
+            activeTargetQuestions = getQuestionsForCategory(cat);
 
             let html = '';
-            questions.forEach((q, idx) => {
-                const val = answers[q.id];
+            activeTargetQuestions.forEach((q, idx) => {
+                const valSelf = answers[q.id];
+                const valCoord = coordAnswers[q.id];
+
                 if (q.type === 'scale') {
+                    let coordinatorInputsHTML = '';
+                    if (isCoordinatorView) {
+                        const valuesList = [1, 2, 3, 4, 5];
+                        let radios = '';
+                        valuesList.forEach(v => {
+                            const isChecked = (valCoord !== undefined && valCoord !== null) ? parseInt(valCoord, 10) === v : (valSelf !== undefined ? parseInt(valSelf, 10) === v : v === 4);
+                            radios += `
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="radio" name="coord_${q.id}" value="${v}" ${isChecked ? 'checked' : ''} class="w-3.5 h-3.5 text-emerald-600 focus:ring-emerald-500">
+                                    <span class="text-xs font-bold text-slate-700">${v}</span>
+                                </label>
+                            `;
+                        });
+                        coordinatorInputsHTML = `
+                            <div class="mt-3 pt-3 border-t border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-2 bg-emerald-50/50 p-2.5 rounded">
+                                <span class="text-xs font-bold text-emerald-800">Valutazione Coordinator:</span>
+                                <div class="flex gap-3">${radios}</div>
+                            </div>
+                        `;
+                    } else if (valCoord !== undefined && valCoord !== null) {
+                        coordinatorInputsHTML = `
+                            <div class="mt-2 text-xs font-semibold text-emerald-700">
+                                Valutazione Referente: <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold">${valCoord} / 5</span>
+                            </div>
+                        `;
+                    }
+
                     html += `
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                             <div class="text-xs font-bold text-indigo-600 uppercase mb-1">${q.cat}</div>
                             <div class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</div>
-                            <div class="text-xs text-slate-600 mb-2">${q.desc}</div>
+                            <div class="text-xs text-slate-600 mb-2 leading-relaxed">${q.desc}</div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-semibold text-slate-700">Punteggio assegnato:</span>
-                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">${val !== undefined ? val : 'N/D'} / 5</span>
+                                <span class="text-xs font-semibold text-slate-700">Autovalutazione Risorsa:</span>
+                                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800">${valSelf !== undefined ? valSelf : 'N/D'} / 5</span>
                             </div>
+                            ${coordinatorInputsHTML}
                         </div>
                     `;
                 } else {
                     html += `
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200 shadow-sm">
                             <div class="text-xs font-bold text-indigo-600 uppercase mb-1">${q.cat}</div>
                             <div class="font-bold text-slate-900 text-sm mb-1">${idx + 1}. ${q.title}</div>
                             <div class="text-xs text-slate-600 mb-2">${q.desc}</div>
-                            <div class="p-3 bg-white border border-slate-200 rounded text-slate-800 text-xs whitespace-pre-wrap">${val || 'Nessuna risposta fornita.'}</div>
+                            <div class="p-3 bg-white border border-slate-200 rounded text-slate-800 text-xs whitespace-pre-wrap">${valSelf || 'Nessuna risposta fornita.'}</div>
                         </div>
                     `;
                 }
             });
 
             contentEl.innerHTML = html;
+
+            if (isCoordinatorView) {
+                btnSaveCoord.classList.remove('hidden');
+            } else {
+                btnSaveCoord.classList.add('hidden');
+            }
+
             toggleViewSchedaModal(true);
+        }
+
+        async function saveCoordinatorEvaluation() {
+            if (!activeTargetEmail || !currentCoordinatorUser) return;
+
+            const btn = document.getElementById('btn-save-coordinator-eval');
+            const msg = document.getElementById('modal-coordinator-msg');
+            btn.disabled = true;
+            btn.textContent = 'Invio in corso...';
+
+            const coordAnswersMap = {};
+            activeTargetQuestions.forEach(q => {
+                if (q.type === 'scale') {
+                    const selected = document.querySelector(`input[name="coord_${q.id}"]:checked`);
+                    coordAnswersMap[q.id] = selected ? parseInt(selected.value, 10) : 4;
+                }
+            });
+
+            const payload = {
+                email_dipendente: activeTargetEmail,
+                risposte_coordinator_json: coordAnswersMap,
+                email_coordinator: currentCoordinatorUser.email,
+                data_valutazione_coordinator: new Date()
+            };
+
+            const { error } = await supabaseClient
+                .from('risposte_valutazioni')
+                .upsert(payload, { onConflict: 'email_dipendente' });
+
+            btn.disabled = false;
+            btn.textContent = 'Invia Valutazione Coordinator';
+
+            if (error) {
+                msg.textContent = 'Errore durante il salvataggio: ' + error.message;
+                msg.className = 'text-xs font-medium text-center text-red-600 mb-2';
+            } else {
+                msg.textContent = '✅ Valutazione inviata con successo! I dati sono stati trasmessi al team HR.';
+                msg.className = 'text-xs font-medium text-center text-emerald-600 mb-2';
+                loadTeamData(currentCoordinatorUser.cognome);
+            }
+            msg.classList.remove('hidden');
         }
 
         function toggleViewSchedaModal(show) {
@@ -708,6 +777,8 @@
                 return;
             }
 
+            currentCoordinatorUser = coordUser;
+
             document.getElementById('coordinator-login-box').classList.add('hidden');
             document.getElementById('coordinator-dashboard').classList.remove('hidden');
             document.getElementById('welcome-coord').textContent = `Team di ${coordUser.nome} ${coordUser.cognome}`;
@@ -718,11 +789,12 @@
             document.getElementById('coordinator-login-box').classList.remove('hidden');
             document.getElementById('coordinator-dashboard').classList.add('hidden');
             document.getElementById('coord-password').value = '';
+            currentCoordinatorUser = null;
         }
 
         async function loadTeamData(coordCognome) {
             const tbody = document.getElementById('team-table-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">Caricamento membri del team...</td></tr>';
 
             const { data: teamMembers } = await supabaseClient
                 .from('dipendenti')
@@ -730,7 +802,7 @@
                 .ilike('referente', `%${coordCognome}%`);
 
             if (!teamMembers || teamMembers.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">Nessuna risorsa associata a te come referente.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">Nessuna risorsa associata a te come referente.</td></tr>`;
                 return;
             }
 
@@ -746,7 +818,8 @@
             tbody.innerHTML = '';
             teamMembers.forEach(m => {
                 const resp = respMap[m.email] || {};
-                const haInviato = resp && resp.stato === 'Inviato';
+                const haInviatoSelf = resp && resp.stato === 'Inviato';
+                const haValutatoCoord = resp && resp.risposte_coordinator_json;
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
@@ -755,13 +828,18 @@
                     <td class="p-3 text-slate-600">${m.email}</td>
                     <td class="p-3 text-slate-500">${m.bu || '-'} / ${m.team || '-'}</td>
                     <td class="p-3 text-center">
-                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haInviato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
-                            ${haInviato ? 'Completato' : 'In attesa'}
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haInviatoSelf ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${haInviatoSelf ? 'Completato' : 'In attesa'}
                         </span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
-                            Visualizza Scheda
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haValutatoCoord ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}">
+                            ${haValutatoCoord ? 'Valutato' : 'Da Valutare'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                            Valuta / Scheda
                         </button>
                     </td>
                 `;
@@ -769,7 +847,7 @@
             });
         }
 
-        // --- LOGIN & DASHBOARD HR ---
+        // --- DASHBOARD HR ---
         async function loginHR() {
             const email = document.getElementById('hr-email').value.trim().toLowerCase();
             const pass = document.getElementById('hr-password').value.trim();
@@ -812,7 +890,7 @@
             if (responses) responses.forEach(r => allResponsesCache[r.email_dipendente] = r);
 
             renderHRAutovalutazioni();
-            renderHRReferenti();
+            renderHRReferentiDettaglio();
             renderHRAnagrafica();
         }
 
@@ -838,7 +916,7 @@
                         </span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
                             Visualizza Scheda
                         </button>
                     </td>
@@ -847,48 +925,41 @@
             });
         }
 
-        function renderHRReferenti() {
-            const tbody = document.getElementById('hr-table-referenti');
+        function renderHRReferentiDettaglio() {
+            const tbody = document.getElementById('hr-table-referenti-dettaglio');
             tbody.innerHTML = '';
 
-            const referentiMap = {};
-            allDipendentiCache.forEach(d => {
-                if (d.referente) {
-                    const refName = d.referente.trim();
-                    if (!referentiMap[refName]) referentiMap[refName] = [];
-                    referentiMap[refName].push(d);
-                }
-            });
-
-            Object.keys(referentiMap).forEach(refName => {
-                const team = referentiMap[refName];
-                const totalTeam = team.length;
-                let autovalInviate = 0;
-
-                team.forEach(m => {
-                    const resp = allResponsesCache[m.email];
-                    if (resp && resp.stato === 'Inviato') autovalInviate++;
-                });
-
-                const percent = Math.round((autovalInviate / totalTeam) * 100);
+            allDipendentiCache.forEach(m => {
+                const resp = allResponsesCache[m.email];
+                const haAutovalutato = resp && resp.stato === 'Inviato';
+                const haValutatoCoord = resp && resp.risposte_coordinator_json;
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
                 tr.innerHTML = `
-                    <td class="p-3 font-medium text-slate-900">${refName}</td>
-                    <td class="p-3 text-center font-semibold">${totalTeam}</td>
-                    <td class="p-3 text-center font-semibold text-slate-700">${autovalInviate} / ${totalTeam}</td>
+                    <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
+                    <td class="p-3 text-slate-600">${m.email}</td>
+                    <td class="p-3 text-slate-500">${m.referente || '-'}</td>
                     <td class="p-3 text-center">
-                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${percent === 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'}">
-                            ${percent}% Completato
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haAutovalutato ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                            ${haAutovalutato ? 'Inviata' : 'In attesa'}
                         </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <span class="px-2 py-1 text-xs rounded-full font-semibold ${haValutatoCoord ? 'bg-indigo-100 text-indigo-800' : 'bg-slate-100 text-slate-600'}">
+                            ${haValutatoCoord ? 'Valutato dal Referente' : 'In attesa'}
+                        </span>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                            Visualizza Comparativa
+                        </button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
         }
 
-        // --- GESTIONE ANAGRAFICA ---
         function renderHRAnagrafica() {
             const tbody = document.getElementById('hr-table-anagrafica');
             tbody.innerHTML = '';
@@ -1013,7 +1084,6 @@
             });
         }
 
-        // --- FUNZIONI DI ESPORTAZIONE EXCEL (.XLSX) ---
         function exportAutovalutazioniExcel() {
             const dataToExport = allDipendentiCache.map(m => {
                 const resp = allResponsesCache[m.email] || {};
@@ -1040,42 +1110,27 @@
         }
 
         function exportReferentiExcel() {
-            const referentiMap = {};
-            allDipendentiCache.forEach(d => {
-                if (d.referente) {
-                    const refName = d.referente.trim();
-                    if (!referentiMap[refName]) referentiMap[refName] = [];
-                    referentiMap[refName].push(d);
-                }
-            });
-
-            const dataToExport = Object.keys(referentiMap).map(refName => {
-                const team = referentiMap[refName];
-                const totalTeam = team.length;
-                let autovalutazioniInviate = 0;
-
-                team.forEach(m => {
-                    const resp = allResponsesCache[m.email];
-                    if (resp && resp.stato === 'Inviato') {
-                        autovalutazioniInviate++;
-                    }
-                });
-
-                const percent = Math.round((autovalutazioniInviate / totalTeam) * 100);
+            const dataToExport = allDipendentiCache.map(m => {
+                const resp = allResponsesCache[m.email] || {};
+                const haAutovalutato = resp.stato === 'Inviato';
+                const coordAnswers = resp.risposte_coordinator_json || {};
 
                 return {
-                    'Referente / Coordinator': refName,
-                    'Membri Totali Team': totalTeam,
-                    'Autovalutazioni Ricevute': `${autovalutazioniInviate} / ${totalTeam}`,
-                    'Avanzamento (%)': `${percent}%`,
-                    'Stato Team': percent === 100 ? 'Completato' : 'In corso'
+                    'Risorsa': `${m.cognome} ${m.nome}`,
+                    'Email Risorsa': m.email,
+                    'Referente': m.referente || '',
+                    'Autovalutazione Inviata': haAutovalutato ? 'Sì' : 'No',
+                    'Valutazione Coordinator Completata': resp.risposte_coordinator_json ? 'Sì' : 'No',
+                    'Email Coordinator Valutatore': resp.email_coordinator || '-',
+                    'Data Valutazione Coordinator': resp.data_valutazione_coordinator ? new Date(resp.data_valutazione_coordinator).toLocaleString('it-IT') : '-',
+                    'Dettaglio Valutazioni Coordinator JSON': JSON.stringify(coordAnswers)
                 };
             });
 
             const worksheet = XLSX.utils.json_to_sheet(dataToExport);
             const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Stato Referenti');
-            XLSX.writeFile(workbook, 'Report_HR_Stato_Referenti.xlsx');
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Valutazioni Referenti');
+            XLSX.writeFile(workbook, 'Report_HR_Valutazioni_Referenti.xlsx');
         }
     </script>
 </body>
