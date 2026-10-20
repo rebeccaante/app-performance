@@ -367,6 +367,12 @@
         let activeTargetYear = 2026;
         let activeTargetQuestions = [];
 
+        // Funzione di utilità per sanificare gli apostrofi nelle stringhe JavaScript dentro attributi onclick
+        function escapeHtmlQuotes(str) {
+            if (!str) return '';
+            return String(str).replace(/'/g, "\\'");
+        }
+
         function initYearSelects() {
             const selects = ['user-year', 'coord-year-select', 'hr-year-select'];
             selects.forEach(sId => {
@@ -739,7 +745,7 @@
                 }
             });
 
-            // AGGIUNTA AREA NOTE / COMMENTO DEL COORDINATOR ALLA FINE
+            // AREA NOTE / COMMENTO DEL COORDINATOR
             const savedNote = coordAnswers['coord_notes'] || '';
             if (isCoordinatorView) {
                 html += `
@@ -967,6 +973,12 @@
                 const haInviatoSelf = resp && resp.stato === 'Inviato';
                 const haValutatoCoord = resp && resp.risposte_coordinator_json;
 
+                const safeEmail = escapeHtmlQuotes(m.email);
+                const safeNome = escapeHtmlQuotes(m.nome);
+                const safeCognome = escapeHtmlQuotes(m.cognome);
+                const safeBu = escapeHtmlQuotes(m.bu || '');
+                const safeTeam = escapeHtmlQuotes(m.team || '');
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b';
                 tr.innerHTML = `
@@ -984,7 +996,7 @@
                         </span>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', true, true, ${selectedYearCoord})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="viewMemberScheda('${safeEmail}', '${safeNome}', '${safeCognome}', '${safeBu}', '${safeTeam}', true, true, ${selectedYearCoord})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-3 py-1.5 rounded transition-colors shadow-sm font-medium">
                             Valuta / Scheda
                         </button>
                     </td>
@@ -1057,6 +1069,12 @@
                 const resp = allResponsesCache[m.email];
                 const completato = resp && resp.stato === 'Inviato';
 
+                const safeEmail = escapeHtmlQuotes(m.email);
+                const safeNome = escapeHtmlQuotes(m.nome);
+                const safeCognome = escapeHtmlQuotes(m.cognome);
+                const safeBu = escapeHtmlQuotes(m.bu || '');
+                const safeTeam = escapeHtmlQuotes(m.team || '');
+
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-slate-50 border-b dip-row';
                 tr.setAttribute('data-search', `${m.cognome} ${m.nome} ${m.email}`.toLowerCase());
@@ -1071,10 +1089,10 @@
                         </span>
                     </td>
                     <td class="p-3 text-center flex justify-center gap-2">
-                        <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, false, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="viewMemberScheda('${safeEmail}', '${safeNome}', '${safeCognome}', '${safeBu}', '${safeTeam}', false, false, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                             👁️ Visualizza
                         </button>
-                        <button onclick="downloadSingleSchedaExcel('${m.email}', false, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                        <button onclick="downloadSingleSchedaExcel('${safeEmail}', false, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                             📥 Scarica Excel
                         </button>
                     </td>
@@ -1106,6 +1124,12 @@
                     const haAutovalutato = resp && resp.stato === 'Inviato';
                     const haValutatoCoord = resp && resp.risposte_coordinator_json;
 
+                    const safeEmail = escapeHtmlQuotes(m.email);
+                    const safeNome = escapeHtmlQuotes(m.nome);
+                    const safeCognome = escapeHtmlQuotes(m.cognome);
+                    const safeBu = escapeHtmlQuotes(m.bu || '');
+                    const safeTeam = escapeHtmlQuotes(m.team || '');
+
                     rowsHTML += `
                         <tr class="hover:bg-slate-50 border-b">
                             <td class="p-3 font-medium text-slate-900">${m.cognome} ${m.nome}</td>
@@ -1121,10 +1145,10 @@
                                 </span>
                             </td>
                             <td class="p-3 text-center flex justify-center gap-2">
-                                <button onclick="viewMemberScheda('${m.email}', '${m.nome}', '${m.cognome}', '${m.bu || ''}', '${m.team || ''}', false, true, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                <button onclick="viewMemberScheda('${safeEmail}', '${safeNome}', '${safeCognome}', '${safeBu}', '${safeTeam}', false, true, ${selectedYearHR})" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                                     👁️ Comparativa
                                 </button>
-                                <button onclick="downloadSingleSchedaExcel('${m.email}', true, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
+                                <button onclick="downloadSingleSchedaExcel('${safeEmail}', true, ${selectedYearHR})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded transition-colors shadow-sm font-medium">
                                     📥 Scarica Excel
                                 </button>
                             </td>
@@ -1183,7 +1207,7 @@
                     <td class="p-2 text-slate-500">${m.referente || '-'}</td>
                     <td class="p-2 text-center flex justify-center gap-2">
                         <button onclick="editEmployee(${m.id})" class="text-indigo-600 hover:text-indigo-900 font-medium">✏️ Modifica</button>
-                        <button onclick="deleteEmployee(${m.id}, '${m.email}')" class="text-red-600 hover:text-red-900 font-medium">🗑️ Elimina</button>
+                        <button onclick="deleteEmployee(${m.id}, '${escapeHtmlQuotes(m.email)}')" class="text-red-600 hover:text-red-900 font-medium">🗑️ Elimina</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
